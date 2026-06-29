@@ -1940,7 +1940,7 @@ function _renderNotes() {
     const next = [...body.children].filter(c => c !== existingForm);
     next.forEach(c => c.remove());
     if (sorted.length === 0) {
-      body.insertAdjacentHTML('beforeend', '<div class="notes-empty-msg">No notes <span style="vertical-align:-3px;margin-left:4px;">' + uiModule.emptyStateIcon('smiley') + '</span></div>');
+      body.insertAdjacentHTML('beforeend', '<div class="ax-empty" style="padding:var(--space-8) var(--space-6)"><div class="ax-empty-title">No notes</div><div class="ax-empty-desc">Add your first note above.</div></div>');
     } else {
       existingForm.insertAdjacentHTML('afterend', html);
     }
@@ -1949,7 +1949,7 @@ function _renderNotes() {
     _renderLabelsInto(body);
     _renderQuickAdd(body);
     if (sorted.length === 0) {
-      body.insertAdjacentHTML('beforeend', '<div class="notes-empty-msg">No notes yet <span style="vertical-align:-3px;margin-left:4px;">' + uiModule.emptyStateIcon('smiley') + '</span></div>');
+      body.insertAdjacentHTML('beforeend', '<div class="ax-empty"><span class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h11M8 12h11M8 18h7"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg></span><div class="ax-empty-title">No notes yet</div><div class="ax-empty-desc">Capture quick todos and goal steps — they\'ll show up here.</div></div>');
     } else {
       body.insertAdjacentHTML('beforeend', html);
     }

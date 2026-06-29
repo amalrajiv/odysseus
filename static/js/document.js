@@ -8956,7 +8956,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
       } else {
         const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const colCount = Math.max(...rows.map(r => r.length));
-        let html = '<div class="csv-table-wrap"><table class="csv-table"><thead><tr>';
+        let html = '<div class="csv-table-wrap"><table class="csv-table ax-table"><thead><tr>';
         for (let j = 0; j < colCount; j++) {
           html += `<th contenteditable="true">${esc(rows[0][j] || '')}</th>`;
         }

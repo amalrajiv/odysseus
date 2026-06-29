@@ -304,6 +304,9 @@ export function showToast(msg, durationOrOpts) {
   _wireToastSwipe(toastEl);
   toastEl.textContent = '';
   toastEl.classList.remove('error');
+  // Success/info toasts are non-urgent: announce politely (don't interrupt).
+  toastEl.setAttribute('role', 'status');
+  toastEl.setAttribute('aria-live', 'polite');
 
   let duration = 1200, actionLabel = null, onAction = null, actionHint = null, actionIcon = null, leadingIcon = null;
   if (typeof durationOrOpts === 'object' && durationOrOpts) {
@@ -417,6 +420,10 @@ export function showError(msg) {
   _wireToastSwipe(toastEl);
   toastEl.textContent = '';
   toastEl.classList.add('error');
+  // Errors are urgent: switch the shared live region to assertive + alert so
+  // screen readers announce them immediately (reset to polite by showToast).
+  toastEl.setAttribute('role', 'alert');
+  toastEl.setAttribute('aria-live', 'assertive');
   toastEl.style.left = '';
   toastEl.style.transform = '';
   toastEl.classList.remove('exiting');

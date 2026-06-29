@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ariadne — Component Preview (Phase 0 + 1)</title>
+<!-- Relative paths so this opens directly via file:// for headless capture. -->
+<link rel="stylesheet" href="../static/style.css">
+<link rel="stylesheet" href="../static/css/components.css">
+<style>
+  /* Neutralize the app's global flex shell so the gallery lays out as a page. */
+  html, body { height: auto !important; }
+  body { display: block !important; overflow: auto !important; padding: 32px; }
+  .gallery { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: var(--text-2xl); margin: 0 0 4px; }
+  .sub { color: var(--muted-foreground); font-size: var(--text-sm); margin: 0 0 28px; }
+  section { margin: 0 0 34px; }
+  h2 { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.06em;
+       color: var(--muted-foreground); margin: 0 0 14px; padding-bottom: 6px;
+       border-bottom: 1px solid var(--border-subtle); }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .col { display: flex; flex-direction: column; gap: 12px; max-width: 360px; }
+  .panel { background: var(--card); border: 1px solid var(--border-subtle);
+           border-radius: var(--radius-lg); padding: 18px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+  .themebar { position: sticky; top: 0; z-index: 50; display: flex; gap: 8px; justify-content: flex-end;
+              padding: 8px 0 16px; background: var(--bg); }
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 44px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+            display: flex; align-items: flex-end; padding: 4px; font-size: 10px; color: var(--muted-foreground); }
+</style>
+</head>
+<body>
+<div class="gallery">
+  <div class="themebar">
+    <button class="ax-btn ax-btn-sm ax-btn-outline" onclick="setTheme('dark')">Dark</button>
+    <button class="ax-btn ax-btn-sm ax-btn-outline" onclick="setTheme('daylight')">Daylight</button>
+  </div>
+
+  <h1>Ariadne Component Preview</h1>
+  <p class="sub">Phase 0 tokens + Phase 1 primitives. Toggle the theme to verify dark/light parity.</p>
+
+  <!-- ── Tokens: scales ── -->
+  <section>
+    <h2>Tokens — spacing · radius · shadow · type · icons</h2>
+    <div class="panel">
+      <div class="row" id="space-row"></div>
+      <div class="row" id="radius-row"></div>
+      <div class="row">
+        <div style="width:120px;height:48px;border-radius:var(--radius-md);background:var(--card);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted-foreground)">shadow-sm</div>
+        <div style="width:120px;height:48px;border-radius:var(--radius-md);background:var(--card);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted-foreground)">shadow-md</div>
+        <div style="width:120px;height:48px;border-radius:var(--radius-md);background:var(--card);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted-foreground)">shadow-lg</div>
+      </div>
+      <div class="row" style="align-items:baseline;gap:18px">
+        <span style="font-size:var(--text-2xl);font-weight:600">2xl</span>
+        <span style="font-size:var(--text-xl);font-weight:600">xl</span>
+        <span style="font-size:var(--text-lg);font-weight:600">lg</span>
+        <span style="font-size:var(--text-base)">base</span>
+        <span style="font-size:var(--text-sm)">sm</span>
+        <span style="font-size:var(--text-xs)">xs</span>
+      </div>
+      <div class="row" style="color:var(--muted-foreground)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+        <span style="font-size:11px">icon xs / sm / md / lg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Buttons ── -->
+  <section>
+    <h2>Buttons — variants · sizes · states</h2>
+    <div class="row">
+      <button class="ax-btn ax-btn-primary">Primary</button>
+      <button class="ax-btn ax-btn-secondary">Secondary</button>
+      <button class="ax-btn ax-btn-outline">Outline</button>
+      <button class="ax-btn ax-btn-ghost">Ghost</button>
+      <button class="ax-btn ax-btn-subtle">Subtle</button>
+      <button class="ax-btn ax-btn-destructive">Delete</button>
+    </div>
+    <div class="row">
+      <button class="ax-btn ax-btn-primary ax-btn-sm">Small</button>
+      <button class="ax-btn ax-btn-primary">Base</button>
+      <button class="ax-btn ax-btn-primary ax-btn-lg">Large</button>
+      <button class="ax-btn ax-btn-primary" disabled>Disabled</button>
+      <button class="ax-btn ax-btn-secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        With icon
+      </button>
+      <button class="ax-btn ax-btn-outline ax-btn-icon" aria-label="Settings" data-ax-tip="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9 1.65 1.65 0 0 0 4.27 7.18l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.2.61.78 1.02 1.42 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Inputs ── -->
+  <section>
+    <h2>Inputs — text · search · textarea · select · field</h2>
+    <div class="grid2">
+      <div class="col">
+        <div class="ax-field">
+          <label class="ax-label">Label</label>
+          <input class="ax-input" placeholder="Placeholder text">
+          <span class="ax-hint">Helper text describing the field.</span>
+        </div>
+        <div class="ax-field">
+          <label class="ax-label">With error</label>
+          <input class="ax-input" aria-invalid="true" value="bad@value">
+          <span class="ax-error">Enter a valid value.</span>
+        </div>
+        <label class="ax-input-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="ax-input" placeholder="Search…" value="model">
+          <button class="ax-input-clear" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </label>
+      </div>
+      <div class="col">
+        <textarea class="ax-textarea" placeholder="Multi-line textarea…"></textarea>
+        <select class="ax-select"><option>Select an option</option><option>Second</option></select>
+        <input class="ax-input" placeholder="Disabled" disabled>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Card ── -->
+  <section>
+    <h2>Card</h2>
+    <div class="grid2">
+      <div class="ax-card">
+        <div class="ax-card-header">
+          <h3 class="ax-card-title">Add Local Models</h3>
+          <p class="ax-card-desc">Add a local model server (Ollama, llama.cpp, vLLM).</p>
+        </div>
+        <div class="ax-card-body">
+          <input class="ax-input" placeholder="Paste endpoint URL…">
+        </div>
+        <div class="ax-card-footer">
+          <button class="ax-btn ax-btn-ghost ax-btn-sm">Test</button>
+          <button class="ax-btn ax-btn-primary ax-btn-sm">Add</button>
+        </div>
+      </div>
+      <div class="ax-card">
+        <div class="ax-card-body">
+          <div class="ax-empty">
+            <span class="ax-empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3Z"/><path d="M10 21h4"/></svg>
+            </span>
+            <div class="ax-empty-title">No memories yet</div>
+            <div class="ax-empty-desc">Things Ariadne remembers about you will show up here.</div>
+            <div class="ax-empty-actions"><button class="ax-btn ax-btn-subtle ax-btn-sm">Import memories</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Badges / kbd / switch ── -->
+  <section>
+    <h2>Badges · Kbd · Switch</h2>
+    <div class="row">
+      <span class="ax-badge">Default</span>
+      <span class="ax-badge ax-badge-primary">Primary</span>
+      <span class="ax-badge ax-badge-success">PERFECT</span>
+      <span class="ax-badge ax-badge-warning">MARGINAL</span>
+      <span class="ax-badge ax-badge-destructive">Error</span>
+      <span class="ax-badge ax-badge-outline">BUILT-IN</span>
+    </div>
+    <div class="row">
+      <span>Press <span class="ax-kbd">⌘</span> <span class="ax-kbd">K</span></span>
+      <button class="ax-switch" role="switch" aria-checked="false" aria-label="off"></button>
+      <button class="ax-switch" role="switch" aria-checked="true" aria-label="on"></button>
+    </div>
+  </section>
+
+  <!-- ── Menu / Dropdown ── -->
+  <section>
+    <h2>Menu / Dropdown</h2>
+    <div class="row" style="align-items:flex-start">
+      <div class="ax-menu">
+        <div class="ax-menu-label">Session</div>
+        <button class="ax-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New chat <span class="ax-menu-shortcut">⌘N</span></button>
+        <button class="ax-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 15 4-4M8 11l4 4"/><circle cx="12" cy="12" r="9"/></svg> Favorite <span class="ax-menu-shortcut">⌘⌥F</span></button>
+        <div class="ax-menu-separator"></div>
+        <button class="ax-menu-item" aria-disabled="true">Disabled item</button>
+        <button class="ax-menu-item ax-menu-item-destructive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg> Delete</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Toast ── -->
+  <section>
+    <h2>Toast</h2>
+    <div class="col" style="max-width:420px">
+      <div class="ax-toast ax-toast-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <div class="ax-toast-body"><div class="ax-toast-title">Saved</div><div class="ax-toast-desc">Your workspace changes were applied.</div></div>
+        <button class="ax-toast-close" aria-label="Dismiss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="ax-toast ax-toast-warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <div class="ax-toast-body"><div class="ax-toast-title">Download stalled</div><div class="ax-toast-desc">Retrying in the background.</div></div>
+      </div>
+      <div class="ax-toast ax-toast-destructive">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <div class="ax-toast-body"><div class="ax-toast-title">Connection failed</div><div class="ax-toast-desc">Check the endpoint URL and try again.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Table ── -->
+  <section>
+    <h2>Table</h2>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="ax-table">
+        <thead><tr>
+          <th class="ax-table-sort" aria-sort="ascending">Model</th>
+          <th class="ax-num">Params</th>
+          <th class="ax-num ax-table-sort" aria-sort="descending">Score</th>
+          <th>Fit</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Qwen3.5-2B</td><td class="ax-num">2.3B</td><td class="ax-num">74.6</td><td><span class="ax-badge ax-badge-success">PERFECT</span></td></tr>
+          <tr><td>gemma-4-12B-it</td><td class="ax-num">12.0B</td><td class="ax-num">59.5</td><td><span class="ax-badge ax-badge-warning">MARGINAL</span></td></tr>
+          <tr><td>LFM2.5-1.2B-Instruct</td><td class="ax-num">1.2B</td><td class="ax-num">68.8</td><td><span class="ax-badge ax-badge-primary">GOOD</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Skeleton ── -->
+  <section>
+    <h2>Skeleton (loading)</h2>
+    <div class="panel">
+      <div class="ax-skeleton ax-skeleton-title"></div>
+      <div class="ax-skeleton ax-skeleton-text" style="width:90%"></div>
+      <div class="ax-skeleton ax-skeleton-text" style="width:75%"></div>
+      <div class="ax-skeleton ax-skeleton-circle" style="width:40px;height:40px;margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ── Tooltip ── -->
+  <section>
+    <h2>Tooltip</h2>
+    <div class="row">
+      <button class="ax-btn ax-btn-outline" data-ax-tip="This is a tooltip">Hover me</button>
+      <span class="ax-hint">(CSS-only via <code>data-ax-tip</code>)</span>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Apply a theme the way the app does: write the five public vars as inline
+  // :root styles; every color-mix-derived token recomputes from there.
+  var THEMES = {
+    dark:     { bg:'#111114', fg:'#e7e7ec', panel:'#17171c', border:'#26262e', red:'#4f46e5' },
+    daylight: { bg:'#fbfbfc', fg:'#1b1b1f', panel:'#ffffff', border:'#e5e5ea', red:'#4f46e5' },
+  };
+  function setTheme(name) {
+    var c = THEMES[name] || THEMES.dark, s = document.documentElement.style;
+    s.setProperty('--bg', c.bg); s.setProperty('--fg', c.fg);
+    s.setProperty('--panel', c.panel); s.setProperty('--border', c.border);
+    s.setProperty('--red', c.red);
+    document.documentElement.dataset.theme = name;
+  }
+  // Build spacing + radius token swatches.
+  (function(){
+    var sp = ['--space-1','--space-2','--space-3','--space-4','--space-6','--space-8','--space-12'];
+    var sr = document.getElementById('space-row');
+    sp.forEach(function(v){ var d=document.createElement('div');
+      d.style.cssText='height:32px;background:var(--primary-subtle);border:1px solid var(--border-subtle);border-radius:4px;width:var('+v+')';
+      d.title=v; sr.appendChild(d); });
+    var rad=['--radius-sm','--radius-md','--radius-lg','--radius-xl'];
+    var rr=document.getElementById('radius-row');
+    rad.forEach(function(v){ var d=document.createElement('div');
+      d.style.cssText='width:56px;height:40px;background:var(--card);border:1px solid var(--border-strong);border-radius:var('+v+');font-size:9px;color:var(--muted-foreground);display:flex;align-items:center;justify-content:center';
+      d.textContent=v.replace('--radius-',''); rr.appendChild(d); });
+  })();
+  // Theme from ?theme= for deterministic headless capture; default dark.
+  var q = new URLSearchParams(location.search).get('theme');
+  setTheme(q || 'dark');
+</script>
+</body>
+</html>

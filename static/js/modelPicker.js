@@ -155,6 +155,7 @@ function _initModelPickerDropdown() {
 
   function _close() {
     if (menu.classList.contains('hidden')) return;
+    btn.setAttribute('aria-expanded', 'false');
     // Restore scroll button
     const _scrollBtn = document.getElementById('scroll-bottom-btn');
     if (_scrollBtn) _scrollBtn.style.display = '';
@@ -623,6 +624,7 @@ function _initModelPickerDropdown() {
     if (menu.classList.contains('hidden') || menu.classList.contains('closing')) {
       // Force-clear any in-progress close animation
       menu.classList.remove('closing', 'hidden');
+      btn.setAttribute('aria-expanded', 'true');
       _populate('');
       if (window.modelsModule && window.modelsModule.refreshModels) {
         window.modelsModule.refreshModels().then(() => {
@@ -752,6 +754,10 @@ export function updateModelPicker() {
   }
 
   const displayName = modelId ? modelId.split('/').pop() : 'Select model';
+  // Empty state gets accent-tinted (Phase 10) so the composer's primary next
+  // action is obvious; class is purely cosmetic, picker behavior is unchanged.
+  const btn = document.getElementById('model-picker-btn');
+  if (btn) btn.classList.toggle('model-picker-empty', !modelId);
   // The header indicator clips long names with ellipsis; show the full model
   // identifier on hover (#1982). No tooltip on the "Select model" placeholder.
   label.title = modelId || '';

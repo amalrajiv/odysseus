@@ -387,20 +387,36 @@ export function createWhirlpool(size = 24) {
  * replace it with results — no manual cleanup needed.
  */
 export function createLoadingRow(text = 'Loading…', size = 16) {
-  const sp = new Spinner('', 'clean', 'whirlpool');
-  sp._wpSize = size;
-  const canvas = sp.createElement();
-  const row = document.createElement('div');
-  row.className = 'lib-loading-row';
-  const label = document.createElement('span');
-  label.textContent = text;
-  row.appendChild(label);
-  row.appendChild(canvas);
-  sp.start();
-  return row;
+  // Phase 6: lists now show shimmer skeleton rows instead of a labeled
+  // whirlpool (whirlpools are reserved for buttons/actions). Returns a detached
+  // element the caller swaps out on render — no cleanup needed (pure CSS
+  // shimmer, no canvas/timer). `text` becomes the SR label; `size` is kept for
+  // signature compatibility.
+  return createSkeletonList(5, text);
+}
+
+/**
+ * A column of skeleton placeholder rows for async list/grid loading. Each row
+ * approximates a list card (title bar + subtitle bar) so content swaps in
+ * without layout shift. Detached element; replace it with results to dismiss.
+ */
+export function createSkeletonList(rows = 5, label = 'Loading…') {
+  const wrap = document.createElement('div');
+  wrap.className = 'ax-skeleton-list';
+  wrap.setAttribute('role', 'status');
+  wrap.setAttribute('aria-label', label);
+  for (let i = 0; i < rows; i++) {
+    const row = document.createElement('div');
+    row.className = 'ax-skeleton-row';
+    row.innerHTML =
+      '<div class="ax-skeleton ax-skeleton-line-title"></div>' +
+      '<div class="ax-skeleton ax-skeleton-line-sub"></div>';
+    wrap.appendChild(row);
+  }
+  return wrap;
 }
 
 export { Spinner };
 
-const spinnerModule = { create, createWhirlpool, createLoadingRow, Spinner };
+const spinnerModule = { create, createWhirlpool, createLoadingRow, createSkeletonList, Spinner };
 export default spinnerModule;

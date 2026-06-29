@@ -276,17 +276,11 @@ export function initSlashAutocomplete(textarea) {
       e.preventDefault();
       selectedIdx = (selectedIdx - 1 + items.length) % items.length;
       _render(popup, items, selectedIdx, textarea.value);
-    } else if (e.key === 'Tab' || (e.key === 'Enter' && !e.shiftKey)) {
-      // Tab always inserts. Enter inserts only when the user hasn't already
-      // typed a full command + args — i.e. the popup is still in completion
-      // mode, not in "ready to submit a typed-out command" mode.
-      const v = textarea.value.trim();
-      const exactHit = items.find(it => it.token === v || it.aliases.includes(v));
-      if (e.key === 'Enter' && exactHit) {
-        // User typed the whole command — let the normal submit path handle it
-        hide();
-        return;
-      }
+    } else if (e.key === 'Tab') {
+      // Tab always completes to the highlighted suggestion. Enter is handled by
+      // the composer's send handler, which defers to window._slashAutocomplete
+      // (below) — so completion wins over submit regardless of which keydown
+      // listener on the textarea fires first.
       e.preventDefault();
       insert(items[selectedIdx].token);
     } else if (e.key === 'Escape') {
@@ -308,6 +302,29 @@ export function initSlashAutocomplete(textarea) {
       if (tok) insert(tok);
     }
   });
+
+  // Expose a tiny API so the composer's Enter handler can defer to the popup
+  // (same pattern as window._ghostAutocomplete). Centralising the
+  // completion-vs-submit decision here makes it immune to the ordering of the
+  // several keydown listeners attached to the textarea.
+  window._slashAutocomplete = {
+    isActive: () => visible && items.length > 0,
+    // Accept the highlighted suggestion. Returns true when it consumed the key
+    // (inserted a completion → caller must block submit), or false when the
+    // typed text already equals the highlighted command (nothing to complete →
+    // caller should let the normal submit path send it).
+    accept: () => {
+      if (!visible || !items.length) return false;
+      const v = textarea.value.trim();
+      const selected = items[selectedIdx];
+      if (selected && (selected.token === v || selected.aliases.includes(v))) {
+        hide();
+        return false;
+      }
+      insert(selected.token);
+      return true;
+    },
+  };
 }
 
 export default { initSlashAutocomplete };

@@ -1844,7 +1844,7 @@ function _dayDetailHTML(dateStr) {
     return h + '</div>';
   }
   const evs = _eventsForDay(dateStr);
-  if (!evs.length) h += '<div class="cal-empty">No events</div>';
+  if (!evs.length) h += '<div class="ax-empty" style="padding:var(--space-8) var(--space-4)"><span class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><div class="ax-empty-title">No events</div><div class="ax-empty-desc">Nothing scheduled for this day.</div><div class="ax-empty-actions"><button type="button" class="ax-btn ax-btn-subtle ax-btn-sm" data-cal-add-event>Add event</button></div></div>';
   else evs.forEach(ev => {
     const t = ev.all_day ? 'All day' : _fmtTime(ev.dtstart) + ' – ' + _fmtTime(ev.dtend);
     const _bgStyle = _calItemBgStyle(ev);
@@ -2200,6 +2200,9 @@ function _wireAll(body) {
   // Solo "+" on the day-detail header: no spin (the small round button
   // doesn't look good rotating in place — open the form immediately).
   document.getElementById('cal-add-day')?.addEventListener('click', () => { if (!_tryQuickAddFromButton()) _showEventForm(null, _selectedDay); });
+  // "Add event" CTA inside the day-detail empty state (wired per-render here,
+  // matching the other one-shot bindings, so it never double-fires).
+  body.querySelector('[data-cal-add-event]')?.addEventListener('click', (e) => { e.preventDefault(); _showEventForm(null, _selectedDay || _today()); });
 
   // Mobile: relocate the toolbar's +New pill so it sits NEXT TO the
   // quick-add row (not inside it — the row has its own border/background

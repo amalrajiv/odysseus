@@ -648,6 +648,15 @@ export function initThemeUI() {
   const activeName = saved ? saved.name : DEFAULT_THEME;
   const customThemes = _loadCustomThemes();
 
+  // Show the active theme's display name next to the heading, and keep it in
+  // sync when a swatch is picked.
+  const _prettyName = (n) => (n === 'dark' ? 'original' : (n === 'gpt' ? 'GPT' : n));
+  function _setActiveLabel(n) {
+    const el = document.getElementById('theme-active-name');
+    if (el) el.textContent = n ? 'Active: ' + _prettyName(n) : '';
+  }
+  _setActiveLabel(activeName);
+
   // Render preset swatches
   grid.innerHTML = Object.entries(THEMES).map(([name, c]) => `
     <div class="theme-swatch${name === activeName ? ' active' : ''}" data-theme="${name}">
@@ -717,6 +726,7 @@ export function initThemeUI() {
         applyColors(colors);
         clearAllActive();
         sw.classList.add('active');
+        _setActiveLabel(name);
         syncPickers(colors);
         const ct = sw.dataset.custom ? customThemes[name] : null;
         const f = ct && ct.font ? ct.font : DEFAULT_FONT;

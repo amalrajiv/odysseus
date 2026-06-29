@@ -26,10 +26,12 @@ function walk(dir, exts, acc = []) {
   return acc;
 }
 
-// 1. Defined ax-* classes (from any selector in components.css)
+// 1. Defined ax-* selectors (class `.ax-…` OR id `#ax-…`) in components.css.
+//    Ids count too: some ax-* namespaced singletons (e.g. #ax-window-switcher)
+//    are referenced by id in JS, so the typo guard must know they're defined.
 const componentsCss = readFileSync(COMPONENTS, 'utf8');
 const defined = new Set();
-for (const m of componentsCss.matchAll(/\.(ax-[a-z0-9-]+)/g)) defined.add(m[1]);
+for (const m of componentsCss.matchAll(/[.#](ax-[a-z0-9-]+)/g)) defined.add(m[1]);
 
 // 2. Used ax-* tokens across html/js
 const files = walk(STATIC, ['.html', '.js']);

@@ -528,9 +528,11 @@ function _renderAlbumsGrid() {
   const albums = _filteredAlbums();
   if (!_albums.length) {
     wrap.innerHTML = `
-      <div class="gallery-albums-empty">
-        <p>No albums yet.</p>
-        <button class="gallery-select-btn" id="gallery-albums-new">+ New album</button>
+      <div class="ax-empty">
+        <span class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+        <div class="ax-empty-title">No albums yet</div>
+        <div class="ax-empty-desc">Group your photos and videos into albums.</div>
+        <div class="ax-empty-actions"><button type="button" class="ax-btn ax-btn-subtle ax-btn-sm" id="gallery-albums-new">New album</button></div>
       </div>`;
     _wireAlbumsEvents(wrap);
     return;
@@ -1183,7 +1185,7 @@ function _renderGrid() {
     </div>`;
 
   if (_items.length === 0) {
-    grid.innerHTML = uploadTile + '<div class="gallery-empty">No photos yet. Click Upload or drag-and-drop to get started!</div>';
+    grid.innerHTML = uploadTile + '<div class="ax-empty" style="grid-column:1/-1"><div class="ax-empty-title">No photos yet</div><div class="ax-empty-desc">Click Upload or drag-and-drop to get started.</div></div>';
     _wireUploadTile();
     if (loadMore) loadMore.style.display = 'none';
     return;

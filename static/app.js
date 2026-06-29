@@ -3136,6 +3136,16 @@ function initializeEventListeners() {
           window._ghostAutocomplete.accept();
           return;
         }
+        // If the slash-command popup is open, complete the highlighted command
+        // instead of submitting the half-typed text (e.g. "/set" → "/setup xai").
+        // accept() returns false when the typed text is already the full command,
+        // in which case we fall through and submit it as-is.
+        if (window._slashAutocomplete && window._slashAutocomplete.isActive()
+            && window._slashAutocomplete.accept()) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         // Check if already submitting before triggering form submission
@@ -3704,6 +3714,15 @@ function startOdysseusApp() {
       const isMobile = window.innerWidth <= 768
 
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !isMobile) {
+        // Slash-command popup open: complete the highlighted command rather than
+        // submitting the half-typed text. accept() returns false once the typed
+        // text already equals the full command, letting it submit normally.
+        if (window._slashAutocomplete && window._slashAutocomplete.isActive()
+            && window._slashAutocomplete.accept()) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
         e.preventDefault();
         // Flush the debounced icon update so dataset.mode reflects the current
         // text state. Without this, a fast type-and-Enter would still see the
@@ -3914,8 +3933,15 @@ function startOdysseusApp() {
     sessionModule.loadSessions()
       .catch(e => console.warn('loadSessions error:', e))
       .finally(() => {
-        const loader = document.getElementById('app-loader');
-        if (loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 300); }
+        // Route through the boot script's helper so the splash honors its
+        // minimum on-screen time (the thread + wordmark animation). Falls back
+        // to a direct removal if the helper isn't present.
+        if (typeof window.__dismissBootLoader === 'function') {
+          window.__dismissBootLoader();
+        } else {
+          const loader = document.getElementById('app-loader');
+          if (loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 300); }
+        }
         // Fire any URL route opener now that sessions + module wiring are
         // ready. Deferred from up top of init for exactly this reason.
         if (window._odysseusRouteOpener) {

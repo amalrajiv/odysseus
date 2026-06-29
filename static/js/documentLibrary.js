@@ -437,14 +437,12 @@ let _libraryArchivedView = false;   // Documents tab showing archived docs?
       if (_librarySearch || _libraryActiveLanguage) {
         grid.innerHTML = '<div class="doclib-empty">No documents match your search.</div>';
       } else {
-        const _impIco = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin:0 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
         grid.innerHTML =
-          '<div class="doclib-empty" style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">' +
-            '<span>No documents yet</span>' +
-            '<span style="opacity:0.7;font-size:11px;">' +
-              '<a href="#" data-doclib-import style="color:var(--accent,var(--red));text-decoration:underline;">Import' + _impIco + '</a>' +
-              ' &middot; or create one in a session' +
-            '</span>' +
+          '<div class="ax-empty">' +
+            '<span class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/></svg></span>' +
+            '<div class="ax-empty-title">No documents yet</div>' +
+            '<div class="ax-empty-desc">Import a document, or create one inside a session.</div>' +
+            '<div class="ax-empty-actions"><button type="button" class="ax-btn ax-btn-subtle ax-btn-sm" data-doclib-import>Import document</button></div>' +
           '</div>';
         grid.querySelector('[data-doclib-import]')?.addEventListener('click', (e) => {
           e.preventDefault();

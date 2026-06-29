@@ -229,6 +229,32 @@ async function _fetchEvents() {
 
 // ---- Helpers ----
 
+// Best-effort cron → human text for the common 5-field patterns. Returns null
+// for anything exotic so the caller can fall back to the raw expression.
+function _cronToHuman(expr) {
+  if (!expr || typeof expr !== 'string') return null;
+  const f = expr.trim().split(/\s+/);
+  if (f.length !== 5) return null;
+  const [min, hr, dom, mon, dow] = f;
+  const star = (v) => v === '*';
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const atTime = () => (/^\d+$/.test(min) && /^\d+$/.test(hr)) ? ` at ${pad2(+hr)}:${pad2(+min)}` : '';
+  let m;
+  if (star(min) && star(hr) && star(dom) && star(mon) && star(dow)) return 'Every minute';
+  if ((m = min.match(/^\*\/(\d+)$/)) && star(hr) && star(dom) && star(mon) && star(dow)) return +m[1] === 1 ? 'Every minute' : `Every ${m[1]} minutes`;
+  if (/^\d+$/.test(min) && star(hr) && star(dom) && star(mon) && star(dow)) return 'Hourly';
+  if (/^\d+$/.test(min) && (m = hr.match(/^\*\/(\d+)$/)) && star(dom) && star(mon) && star(dow)) return +m[1] === 1 ? 'Hourly' : `Every ${m[1]} hours`;
+  if (/^\d+$/.test(min) && /^\d+$/.test(hr) && star(dom) && star(mon) && star(dow)) return `Daily${atTime()}`;
+  if (/^\d+$/.test(min) && /^\d+$/.test(hr) && star(dom) && star(mon) && /^\d+$/.test(dow)) {
+    const day = DAYS_OF_WEEK[(+dow) % 7] || `day ${dow}`;
+    return `Weekly on ${day}${atTime()}`;
+  }
+  if (/^\d+$/.test(min) && /^\d+$/.test(hr) && /^\d+$/.test(dom) && star(mon) && star(dow)) {
+    return `Monthly on the ${dom}${ordinalSuffix(+dom)}${atTime()}`;
+  }
+  return null;
+}
+
 function _scheduleLabel(task) {
   const tt = task.trigger_type || 'schedule';
   if (tt === 'event') {
@@ -238,7 +264,7 @@ function _scheduleLabel(task) {
   }
   if (tt === 'webhook') return 'Webhook';
   const t = task.scheduled_time || '00:00';
-  if (task.schedule === 'cron') return `Cron: ${task.cron_expression || '?'}`;
+  if (task.schedule === 'cron') return _cronToHuman(task.cron_expression) || `Cron: ${task.cron_expression || '?'}`;
   if (task.schedule === 'once') {
     if (task.scheduled_date) {
       const d = new Date(task.scheduled_date);
@@ -759,8 +785,10 @@ function _renderList() {
     if (task.run_count > 0) metaParts.push(task.run_count + ' run' + (task.run_count !== 1 ? 's' : ''));
     const meta = document.createElement('div');
     meta.className = 'memory-item-meta';
-    meta.style.cssText = 'font-size:10px;opacity:0.4;margin-top:-1px;';
+    meta.style.cssText = 'font-size:11px;opacity:0.5;margin-top:-1px;';
     meta.textContent = metaParts.join(' · ');
+    // Keep the raw cron available on hover when the label is humanized.
+    if (task.schedule === 'cron' && task.cron_expression) meta.title = 'Cron: ' + task.cron_expression;
     content.appendChild(meta);
 
     const statusPill = titleRow.querySelector('[data-task-status-action]');

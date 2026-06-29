@@ -2527,20 +2527,14 @@ function _initFilterPicker() {
 
 function _renderEmailLoading(grid) {
   if (!grid) return null;
+  // Phase 6: shimmer skeleton rows instead of a single centered whirlpool, so
+  // the inbox reserves its space and reads as "loading content" rather than a
+  // blank pause. Returns null — the (few) callers all guard with `if (sp)`, and
+  // the skeleton is plain CSS (no canvas/timer to tear down); it's replaced when
+  // _renderGrid() paints the real list.
   grid.innerHTML = '';
-  const wrap = document.createElement('div');
-  wrap.className = 'email-loading email-loading-with-label';
-  let sp = null;
-  try {
-    sp = spinnerModule.createWhirlpool(28);
-    wrap.appendChild(sp.element);
-  } catch (_) {}
-  const label = document.createElement('div');
-  label.className = 'email-loading-label';
-  label.textContent = 'Loading emails';
-  wrap.appendChild(label);
-  grid.appendChild(wrap);
-  return sp;
+  grid.appendChild(spinnerModule.createSkeletonList(6, 'Loading emails'));
+  return null;
 }
 
 // Refreshes the small accent-pill in the modal title with the unread count
@@ -2806,11 +2800,11 @@ function _renderGrid() {
     );
     if (_isTrulyEmpty) {
       grid.innerHTML =
-        '<div class="email-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;">' +
-          '<span>No emails' + _smileyIco + '</span>' +
-          '<span style="opacity:0.7;font-size:11px;">' +
-            'Set up at: <a href="#" data-open-settings="integrations" style="color:var(--accent,var(--red));text-decoration:underline;">Settings &rsaquo; Integrations</a>' +
-          '</span>' +
+        '<div class="ax-empty">' +
+          '<span class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>' +
+          '<div class="ax-empty-title">No emails yet</div>' +
+          '<div class="ax-empty-desc">Connect a mail account to read and triage your inbox right here.</div>' +
+          '<div class="ax-empty-actions"><button type="button" class="ax-btn ax-btn-subtle ax-btn-sm" data-open-settings="integrations">Connect account</button></div>' +
         '</div>';
       const _link = grid.querySelector('[data-open-settings]');
       if (_link) _link.addEventListener('click', (e) => {
