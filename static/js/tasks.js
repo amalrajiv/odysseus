@@ -647,7 +647,10 @@ function _renderList() {
     if (!_tasksFetched) {
       list.appendChild(spinnerModule.createLoadingRow('Loading…'));
     } else {
-      list.innerHTML = '<div style="opacity:0.4;font-size:12px;text-align:center;padding:24px 0;">No tasks yet. Create one to get started.</div>';
+      list.innerHTML = '<div class="ax-empty">'
+        + '<div class="ax-empty-title">No tasks yet</div>'
+        + '<div class="ax-empty-desc">Create one to get started.</div>'
+        + '</div>';
     }
     return;
   }
@@ -676,7 +679,10 @@ function _renderList() {
     return (a.name || '').localeCompare(b.name || '');
   });
   if (visible.length === 0) {
-    list.innerHTML = '<div style="opacity:0.4;font-size:12px;text-align:center;padding:24px 0;">No matching tasks.</div>';
+    list.innerHTML = '<div class="ax-empty">'
+      + '<div class="ax-empty-title">No matches</div>'
+      + '<div class="ax-empty-desc">Try a different search term or category.</div>'
+      + '</div>';
     return;
   }
 

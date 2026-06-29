@@ -920,7 +920,7 @@ export function openEmailLibrary(opts = {}) {
               <button class="memory-toolbar-btn email-filter-refresh-btn" id="email-lib-refresh-btn" title="Refresh">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
               </button>
-              <button class="memory-toolbar-btn email-reminders-clear-btn hidden" id="email-reminders-clear-btn" title="Permanently delete Odysseus reminder emails">
+              <button class="memory-toolbar-btn email-reminders-clear-btn hidden" id="email-reminders-clear-btn" title="Permanently delete Ariadne reminder emails">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>
                 Clear
               </button>
@@ -936,7 +936,7 @@ export function openEmailLibrary(opts = {}) {
               <button class="memory-toolbar-btn email-undone-toggle email-undone-toggle-inline" id="email-undone-btn" title="Show only emails not marked as done (undone)">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
-              <button class="memory-toolbar-btn email-reminder-toggle-inline hidden" id="email-reminder-btn" title="Show Odysseus reminder emails">
+              <button class="memory-toolbar-btn email-reminder-toggle-inline hidden" id="email-reminder-btn" title="Show Ariadne reminder emails">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
               </button>
               <button class="memory-toolbar-btn email-attach-toggle email-attach-toggle-inline" id="email-attach-btn" title="Show only emails with attachments">
@@ -1087,7 +1087,7 @@ export function openEmailLibrary(opts = {}) {
     _loadEmailsFresh();
   });
   document.getElementById('email-reminders-clear-btn')?.addEventListener('click', async () => {
-    const ok = await styledConfirm('Permanently delete all Odysseus reminder emails?', {
+    const ok = await styledConfirm('Permanently delete all Ariadne reminder emails?', {
       confirmText: 'Delete',
       cancelText: 'Cancel',
       danger: true,
@@ -2711,12 +2711,12 @@ async function _loadScheduled(grid, sp) {
     content.innerHTML = `
       <div style="display:flex;align-items:center;gap:6px;">
         <span class="memory-item-title">${_esc(subject)}</span>
-        ${it.status === 'failed' ? '<span style="font-size:9px;color:var(--red);border:1px solid var(--red);padding:1px 4px;border-radius:4px;">FAILED</span>' : '<span style="font-size:9px;opacity:0.6;border:1px solid var(--border);padding:1px 4px;border-radius:4px;">PENDING</span>'}
+        ${it.status === 'failed' ? '<span style="font-size:9px;color:var(--destructive);border:1px solid var(--destructive);padding:1px 4px;border-radius:4px;">FAILED</span>' : '<span style="font-size:9px;opacity:0.6;border:1px solid var(--border);padding:1px 4px;border-radius:4px;">PENDING</span>'}
       </div>
       <div style="font-size:10px;opacity:0.7;margin-top:2px;">
         To: ${_esc(toDisplay)} · Sends ${_esc(dateStr)}
       </div>
-      ${it.error ? `<div style="font-size:10px;color:var(--red);margin-top:2px;">${_esc(it.error)}</div>` : ''}
+      ${it.error ? `<div style="font-size:10px;color:var(--destructive);margin-top:2px;">${_esc(it.error)}</div>` : ''}
     `;
     card.appendChild(content);
 
@@ -3250,7 +3250,7 @@ async function _toggleCardPreview(card, em) {
       return;
     }
     if (data.error) {
-      reader.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">Error: ${_esc(data.error)}</div>`;
+      reader.innerHTML = `<div style="padding:20px;color:var(--destructive)">Error: ${_esc(data.error)}</div>`;
       return;
     }
 
@@ -3474,7 +3474,7 @@ async function _toggleCardPreview(card, em) {
     // Always stop bubbling so the card's click doesn't fire while reading.
     reader.addEventListener('click', (ev) => { ev.stopPropagation(); });
   } catch (e) {
-    reader.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">Failed to load email</div>`;
+    reader.innerHTML = `<div style="padding:20px;color:var(--destructive)">Failed to load email</div>`;
   }
 }
 
@@ -4285,7 +4285,7 @@ async function _toggleFromSenderPanel(reader, data, btn) {
       panel._setResults(emails, { showFolder: false });
     }
   } catch (err) {
-    listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--red, #e55)">Failed to load: ${_esc(String(err))}</div>`;
+    listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--destructive)">Failed to load: ${_esc(String(err))}</div>`;
   }
   const updatePlaceholder = () => {
     if (!searchEl) return;
@@ -4328,7 +4328,7 @@ async function _toggleFromSenderPanel(reader, data, btn) {
       updatePlaceholder();
     } catch (err) {
       if (myToken !== _recentToken) return;
-      listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--red, #e55)">Failed to load: ${_esc(String(err))}</div>`;
+      listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--destructive)">Failed to load: ${_esc(String(err))}</div>`;
     }
   };
 
@@ -4382,7 +4382,7 @@ async function _toggleFromSenderPanel(reader, data, btn) {
         panel._setResults(merged, { showFolder: true });
       } catch (err) {
         if (myToken !== searchToken) return;
-        listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--red, #e55)">Search failed: ${_esc(String(err))}</div>`;
+        listEl.innerHTML = `<div class="from-sender-empty" style="color:var(--destructive)">Search failed: ${_esc(String(err))}</div>`;
       }
     };
 
@@ -5003,7 +5003,7 @@ async function _openEmailAsTab(em, folder) {
     const res = await fetch(`${API_BASE}/api/email/read/${em.uid}?folder=${encodeURIComponent(useFolder)}${_acct()}`);
     const data = await res.json();
     if (data.error) {
-      reader.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">Error: ${_esc(data.error)}</div>`;
+      reader.innerHTML = `<div style="padding:20px;color:var(--destructive)">Error: ${_esc(data.error)}</div>`;
       return;
     }
     _syncEmailReadState(em.uid, true);
@@ -5083,7 +5083,7 @@ async function _openEmailAsTab(em, folder) {
       try { _showReaderMoreMenu(em, modal, reader, ev.currentTarget); } catch {}
     });
   } catch (err) {
-    reader.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">Failed to load: ${_esc(String(err))}</div>`;
+    reader.innerHTML = `<div style="padding:20px;color:var(--destructive)">Failed to load: ${_esc(String(err))}</div>`;
   }
 }
 
@@ -5150,7 +5150,7 @@ async function _openEmailWindow(em, folder) {
     const res = await fetch(`${API_BASE}/api/email/read/${em.uid}?folder=${encodeURIComponent(useFolder)}${_acct()}`);
     const data = await res.json();
     if (data.error) {
-      bodyEl.innerHTML = `<div style="color:var(--red,#e55);padding:16px;">${_esc(data.error)}</div>`;
+      bodyEl.innerHTML = `<div style="color:var(--destructive);padding:16px;">${_esc(data.error)}</div>`;
       return;
     }
     _syncEmailReadState(em.uid, true);
@@ -5243,7 +5243,7 @@ async function _openEmailWindow(em, folder) {
       try { _showReaderMoreMenu(em, modal, bodyEl, ev.currentTarget); } catch {}
     });
   } catch (err) {
-    bodyEl.innerHTML = `<div style="color:var(--red,#e55);padding:16px;">Failed to load: ${_esc(String(err))}</div>`;
+    bodyEl.innerHTML = `<div style="color:var(--destructive);padding:16px;">Failed to load: ${_esc(String(err))}</div>`;
   }
 }
 
@@ -5266,7 +5266,7 @@ async function _swapReaderToUid(reader, uid, folder) {
     const res = await fetch(`${API_BASE}/api/email/read/${uid}?folder=${encodeURIComponent(useFolder)}${_acct()}`);
     const data = await res.json();
     if (data.error) {
-      body.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">${_esc(data.error)}</div>`;
+      body.innerHTML = `<div style="padding:20px;color:var(--destructive)">${_esc(data.error)}</div>`;
       return;
     }
     _syncEmailReadState(uid, true);
@@ -5332,7 +5332,7 @@ async function _swapReaderToUid(reader, uid, folder) {
     // an attachment chip would do nothing.
     _wireAttachmentHandlers(reader, useFolder);
   } catch (err) {
-    body.innerHTML = `<div style="padding:20px;color:var(--red,#e55)">${_esc(String(err))}</div>`;
+    body.innerHTML = `<div style="padding:20px;color:var(--destructive)">${_esc(String(err))}</div>`;
   }
 }
 
@@ -5450,7 +5450,7 @@ async function _generateSummary(reader, data, btn) {
         if (label) label.textContent = 'Summary';
       }
     } else {
-      content.innerHTML = `<span style="color:var(--red)">${_esc(result.error || 'Failed to summarize')}</span>`;
+      content.innerHTML = `<span style="color:var(--destructive)">${_esc(result.error || 'Failed to summarize')}</span>`;
       panel.remove();
     }
   } catch (e) {
@@ -5997,7 +5997,7 @@ function _updateBulkBar() {
   const actions = document.getElementById('email-lib-bulk-actions');
   if (actions) actions.style.color = state._selectedUids.size > 0 ? 'var(--fg)' : '';
   const deleteBtn = document.getElementById('email-lib-bulk-delete');
-  if (deleteBtn) deleteBtn.style.color = state._selectedUids.size > 0 ? 'var(--red)' : '';
+  if (deleteBtn) deleteBtn.style.color = state._selectedUids.size > 0 ? 'var(--destructive)' : '';
 }
 
 async function _bulkAction(action) {

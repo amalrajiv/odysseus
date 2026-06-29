@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ax-* visual harness</title>
+<link rel="stylesheet" href="../static/style.css" />
+<link rel="stylesheet" href="../static/css/components.css" />
+<script>
+  // Toggle light theme via #light so a single page can be shot in both themes.
+  if (location.hash === '#light') document.documentElement.classList.add('light');
+</script>
+<style>
+  /* Neutralise the app's global body{display:flex;height:100vh} shell layout
+     so the harness stacks normally. */
+  html, body { height: auto !important; }
+  body { margin: 0 !important; padding: 24px !important; display: block !important;
+         background: var(--bg); color: var(--fg); font-family: var(--font-sans); }
+  h2 { font-size: 13px; color: var(--fg-muted); font-weight: 600; margin: 22px 0 8px;
+       text-transform: uppercase; letter-spacing: .04em; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+         padding: 10px; border: 1px solid var(--border); border-radius: 10px;
+         background: var(--panel); }
+  .label { width: 160px; font-size: 12px; color: var(--fg-muted); }
+</style>
+</head>
+<body>
+  <h2>Flow 1 — confirm dialog buttons (converged onto ax-btn)</h2>
+  <div class="row"><span class="label">confirm-btn (primary)</span>
+    <button class="confirm-btn confirm-btn-secondary">Cancel</button>
+    <button class="confirm-btn confirm-btn-primary">Confirm</button>
+  </div>
+  <div class="row"><span class="label">confirm-btn (danger)</span>
+    <button class="confirm-btn confirm-btn-secondary">Cancel</button>
+    <button class="confirm-btn confirm-btn-danger">Delete</button>
+  </div>
+  <div class="row"><span class="label">disabled</span>
+    <button class="confirm-btn confirm-btn-primary" disabled>Disabled</button>
+  </div>
+
+  <h2>Reference — native ax-btn (should match above)</h2>
+  <div class="row"><span class="label">ax-btn-sm</span>
+    <button class="ax-btn ax-btn-sm ax-btn-secondary">Cancel</button>
+    <button class="ax-btn ax-btn-sm ax-btn-primary">Confirm</button>
+    <button class="ax-btn ax-btn-sm ax-btn-destructive">Delete</button>
+  </div>
+  <div class="row"><span class="label">ax-btn (default)</span>
+    <button class="ax-btn ax-btn-secondary">Cancel</button>
+    <button class="ax-btn ax-btn-primary">Save</button>
+  </div>
+
+  <h2>Real primary CTAs (light-fix beneficiaries — were grey #eaeaea in light before)</h2>
+  <div class="row setup-wizard"><span class="label">.setup-connect-btn</span>
+    <button class="setup-connect-btn">Connect</button>
+    <button class="model-endpoint-add-btn">+ Add endpoint</button>
+  </div>
+
+  <h2>Prompt input</h2>
+  <div class="row"><span class="label">styled-prompt-input</span>
+    <input class="styled-prompt-input" placeholder="Type a name…" style="max-width:280px" />
+  </div>
+
+  <h2>Computed-style debug</h2>
+  <pre id="dbg" class="row" style="display:block;white-space:pre-wrap;font-family:var(--font-mono);font-size:12px"></pre>
+  <script>
+    (function () {
+      const rs = getComputedStyle(document.documentElement);
+      const btn = document.querySelector('.confirm-btn-primary');
+      const bs = getComputedStyle(btn);
+      const tok = ['--red','--primary','--primary-foreground','--destructive','--muted','--elevated','--foreground','--background'];
+      const lines = ['theme=' + (document.documentElement.className || 'dark')];
+      for (const t of tok) lines.push(t + ' = ' + rs.getPropertyValue(t).trim());
+      lines.push('--- .confirm-btn-primary computed ---');
+      lines.push('background-color = ' + bs.backgroundColor);
+      lines.push('color = ' + bs.color);
+      lines.push('height = ' + bs.height + '  border-radius = ' + bs.borderTopLeftRadius);
+      document.getElementById('dbg').textContent = lines.join('\n');
+    })();
+  </script>
+</body>
+</html>

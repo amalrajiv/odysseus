@@ -1,0 +1,51 @@
+{
+  "fontsReady": "loaded",
+  "loadedFonts": 31,
+  "navItemText": "",
+  "navItem": {
+    "sel": "#sidebar-toggle-btn",
+    "opacity": "1",
+    "visibility": "visible",
+    "display": "none",
+    "filter": "none",
+    "transform": "none",
+    "color": "rgb(231, 231, 236)",
+    "bg": "rgb(17, 17, 20)",
+    "font": "Inter, system-ui, -apple-syste"
+  },
+  "chain": [
+    {
+      "sel": "#sidebar",
+      "opacity": "1",
+      "visibility": "visible",
+      "display": "flex",
+      "filter": "none",
+      "transform": "none",
+      "color": "rgb(231, 231, 236)",
+      "bg": "rgb(23, 23, 28)",
+      "font": "Inter, system-ui, -apple-syste"
+    },
+    {
+      "sel": "BODY.",
+      "opacity": "1",
+      "visibility": "visible",
+      "display": "flex",
+      "filter": "none",
+      "transform": "none",
+      "color": "rgb(231, 231, 236)",
+      "bg": "rgb(17, 17, 20)",
+      "font": "Inter, system-ui, -apple-syste"
+    },
+    {
+      "sel": "HTML.",
+      "opacity": "1",
+      "visibility": "visible",
+      "display": "block",
+      "filter": "none",
+      "transform": "none",
+      "color": "rgb(0, 0, 0)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Times"
+    }
+  ]
+}

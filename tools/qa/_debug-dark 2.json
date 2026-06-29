@@ -1,0 +1,16 @@
+{
+  "bodyClass": "hamburger-left welcome-ready",
+  "center": {
+    "tag": "DIV",
+    "id": "loader-wave",
+    "cls": ""
+  },
+  "covers": [
+    {
+      "id": "app-loader",
+      "cls": "",
+      "z": "99999",
+      "op": "1"
+    }
+  ]
+}

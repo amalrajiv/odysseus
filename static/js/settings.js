@@ -555,7 +555,7 @@ async function initDefaultChat() {
       });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(function() { msg.textContent = ''; }, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   epSel.addEventListener('change', function() { refreshModels(''); saveDefault(); });
@@ -624,7 +624,7 @@ async function initUtilityModel() {
       });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(function() { msg.textContent = ''; }, 1500);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   epSel.addEventListener('change', function() { refreshModels(''); saveUtility(); });
@@ -720,7 +720,7 @@ async function initTeacherModel() {
       msg.textContent = enabled ? (spec ? 'Saved' : 'Pick an endpoint + model') : 'Disabled';
       msg.style.color = enabled && !spec ? 'var(--red)' : 'var(--fg)';
       setTimeout(function() { msg.textContent = ''; }, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   if (enabledToggle) {
@@ -794,7 +794,7 @@ async function initImageSettings() {
       await fetch('/api/auth/settings', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_gen_enabled: enabledToggle ? enabledToggle.checked : false, image_model: modelSel.value, image_quality: qualSel.value }) });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)'; setTimeout(() => { msg.textContent = ''; }, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
   modelSel.addEventListener('change', saveSettings);
   qualSel.addEventListener('change', saveSettings);
@@ -868,7 +868,7 @@ async function initVisionSettings() {
       await fetch('/api/auth/settings', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vision_enabled: enabledToggle ? enabledToggle.checked : true, vision_model: vlSel.value }) });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)'; setTimeout(() => { msg.textContent = ''; }, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
   vlSel.addEventListener('change', saveSettings);
   if (enabledToggle) enabledToggle.addEventListener('change', function() { syncVisionDisabled(); saveSettings(); });
@@ -951,7 +951,7 @@ async function initTtsSettings() {
         body: JSON.stringify({ tts_enabled: ttsEnabledToggle ? ttsEnabledToggle.checked : true, tts_provider: provSel.value, tts_model: getModel() || 'tts-1', tts_voice: getVoice() || 'alloy', tts_speed: speedSelect.value || '1' }) });
       ttsMsg.textContent = 'Saved'; ttsMsg.style.color = 'var(--fg)'; setTimeout(() => { ttsMsg.textContent = ''; }, 2000);
       if (window.aiTTSManager) window.aiTTSManager.checkAvailability();
-    } catch (e) { ttsMsg.textContent = 'Failed to save'; ttsMsg.style.color = 'var(--red)'; }
+    } catch (e) { ttsMsg.textContent = 'Failed to save'; ttsMsg.style.color = 'var(--destructive)'; }
   }
 
   async function saveAndClearCache() {
@@ -989,7 +989,7 @@ async function initTtsSettings() {
       }
       var prov = provSel.value;
       if (prov === 'disabled') {
-        ttsMsg.textContent = 'Select a provider first'; ttsMsg.style.color = 'var(--red, #e55)';
+        ttsMsg.textContent = 'Select a provider first'; ttsMsg.style.color = 'var(--destructive)';
         setTimeout(function() { ttsMsg.textContent = ''; }, 2000); return;
       }
       var testText = 'Hello, this is a test of text to speech.';
@@ -1007,7 +1007,7 @@ async function initTtsSettings() {
             if (match) utt.voice = match;
           }
           utt.rate = parseFloat(speedSelect.value) || 1;
-          previewBtn.textContent = 'Stop'; previewBtn.style.borderColor = 'var(--red, #e55)';
+          previewBtn.textContent = 'Stop'; previewBtn.style.borderColor = 'var(--destructive)';
           await new Promise(function(resolve, reject) {
             utt.onend = resolve;
             utt.onerror = function(e) { reject(new Error('Browser TTS: ' + e.error)); };
@@ -1023,7 +1023,7 @@ async function initTtsSettings() {
           var blob = await res.blob();
           var url = URL.createObjectURL(blob);
           previewAudio = new Audio(url);
-          previewBtn.textContent = 'Stop'; previewBtn.style.borderColor = 'var(--red, #e55)';
+          previewBtn.textContent = 'Stop'; previewBtn.style.borderColor = 'var(--destructive)';
           await new Promise(function(resolve, reject) {
             previewAudio.onended = function() { URL.revokeObjectURL(url); previewAudio = null; resolve(); };
             previewAudio.onerror = function() { URL.revokeObjectURL(url); previewAudio = null; reject(new Error('Playback failed')); };
@@ -1031,7 +1031,7 @@ async function initTtsSettings() {
           });
         }
       } catch (e) {
-        ttsMsg.textContent = 'Preview failed: ' + e.message; ttsMsg.style.color = 'var(--red, #e55)';
+        ttsMsg.textContent = 'Preview failed: ' + e.message; ttsMsg.style.color = 'var(--destructive)';
         setTimeout(function() { ttsMsg.textContent = ''; }, 3000);
       } finally {
         resetPreview();
@@ -1116,7 +1116,7 @@ async function initSttSettings() {
       // Notify voiceRecorder of effective provider and update send button icon
       if (window.voiceRecorderModule) window.voiceRecorderModule._sttProvider = effectiveProvider();
       if (window._updateSendBtnIcon) window._updateSendBtnIcon();
-    } catch (e) { sttMsg.textContent = 'Failed to save'; sttMsg.style.color = 'var(--red)'; }
+    } catch (e) { sttMsg.textContent = 'Failed to save'; sttMsg.style.color = 'var(--destructive)'; }
   }
 
   provSel.addEventListener('change', function() { updateVisibility(); saveSTT(); });
@@ -1274,7 +1274,7 @@ async function initSearchSettings() {
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(refreshStatus, 2000);
       if (searchModule && searchModule.refresh) searchModule.refresh();
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   provSel.addEventListener('change', function() { updateVisibility(); saveSearch(); _syncSearchPicker(); });
@@ -1429,7 +1429,7 @@ async function initSearchSettings() {
       });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(refreshStatus, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
     _renderFallbackChain();
   }
   _renderFallbackChain();
@@ -1443,7 +1443,7 @@ async function initSearchSettings() {
       var prov = provSel.value;
       if (!prov || prov === 'disabled') {
         msg.textContent = 'Pick a provider first';
-        msg.style.color = 'var(--red)';
+        msg.style.color = 'var(--destructive)';
         return;
       }
       // Persist current form values first so the test uses what's on screen.
@@ -1473,10 +1473,10 @@ async function initSearchSettings() {
         var ms = Math.round(performance.now() - t0);
         if (d.error) {
           msg.textContent = '✗ ' + d.error + ' (' + ms + 'ms)';
-          msg.style.color = 'var(--red)';
+          msg.style.color = 'var(--destructive)';
         } else if (!d.results || !d.results.length) {
           msg.textContent = '⚠ No results returned (' + ms + 'ms)';
-          msg.style.color = 'var(--red)';
+          msg.style.color = 'var(--destructive)';
         } else {
           var topTitle = (d.results[0].title || d.results[0].url || '').slice(0, 60);
           msg.textContent = '✓ ' + d.results.length + ' result' + (d.results.length === 1 ? '' : 's') + ' · ' + ms + 'ms · top: ' + topTitle;
@@ -1484,7 +1484,7 @@ async function initSearchSettings() {
         }
       } catch (e) {
         msg.textContent = '✗ Test failed: ' + (e && e.message ? e.message : e);
-        msg.style.color = 'var(--red)';
+        msg.style.color = 'var(--destructive)';
       } finally {
         if (wp) { try { wp.destroy(); } catch (_) {} }
         testBtn.disabled = false; testBtn.innerHTML = origHtml;
@@ -1596,7 +1596,7 @@ async function initResearchSettings() {
       });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(showStatus, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   epSel.addEventListener('change', async function() {
@@ -1639,7 +1639,7 @@ async function initResearchSearchSettings() {
       var hasKey = ((settings[kf] || '').trim() || (settings.search_api_key || '').trim());
       if (!hasKey) {
         opt.textContent = (_searchLabels[prov] || prov) + ' (no key)';
-        opt.style.color = 'var(--red)';
+        opt.style.color = 'var(--destructive)';
       } else {
         opt.textContent = _searchLabels[prov] || prov;
         opt.style.color = '';
@@ -1663,7 +1663,7 @@ async function initResearchSearchSettings() {
       });
       msg.textContent = 'Saved'; msg.style.color = 'var(--fg)';
       setTimeout(function() { msg.textContent = ''; }, 2000);
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   searchSel.addEventListener('change', function() { updateSearchLogo(); saveResearchSearch(); });
@@ -1710,7 +1710,7 @@ async function initAgentSettings() {
         (rounds != null ? ' · ' + rounds + ' steps/message' : '') +
         (supInput && supInput.checked ? ' · supervisor on' : '');
       msg.style.color = 'var(--fg)';
-    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--red)'; }
+    } catch (e) { msg.textContent = 'Failed to save'; msg.style.color = 'var(--destructive)'; }
   }
 
   toolsInput.addEventListener('change', save);
@@ -2181,9 +2181,9 @@ function initAccount() {
       const nw = el('settings-pw-new').value;
       const conf = el('settings-pw-confirm').value;
       msgEl.style.color = '';
-      if (!cur || !nw) { msgEl.textContent = 'Fill in all fields'; msgEl.style.color = 'var(--red)'; return; }
-      if (nw.length < _authPolicy.password_min_length) { msgEl.textContent = `Min ${_authPolicy.password_min_length} characters`; msgEl.style.color = 'var(--red)'; return; }
-      if (nw !== conf) { msgEl.textContent = 'Passwords don\'t match'; msgEl.style.color = 'var(--red)'; return; }
+      if (!cur || !nw) { msgEl.textContent = 'Fill in all fields'; msgEl.style.color = 'var(--destructive)'; return; }
+      if (nw.length < _authPolicy.password_min_length) { msgEl.textContent = `Min ${_authPolicy.password_min_length} characters`; msgEl.style.color = 'var(--destructive)'; return; }
+      if (nw !== conf) { msgEl.textContent = 'Passwords don\'t match'; msgEl.style.color = 'var(--destructive)'; return; }
       saveBtn.disabled = true;
       try {
         const res = await fetch('/api/auth/change-password', {
@@ -2198,7 +2198,7 @@ function initAccount() {
         el('settings-pw-new').value = '';
         el('settings-pw-confirm').value = '';
       } catch (e) {
-        msgEl.style.color = 'var(--red)';
+        msgEl.style.color = 'var(--destructive)';
         msgEl.textContent = e.message;
       } finally {
         saveBtn.disabled = false;
@@ -2228,7 +2228,7 @@ function initAccount() {
           el('tfa-disable-btn').addEventListener('click', async () => {
             const pw = el('tfa-disable-pw').value;
             const msg = el('tfa-msg');
-            if (!pw) { msg.textContent = 'Enter your password'; msg.style.color = 'var(--red)'; return; }
+            if (!pw) { msg.textContent = 'Enter your password'; msg.style.color = 'var(--destructive)'; return; }
             try {
               const r = await fetch('/api/auth/2fa/disable', {
                 method: 'POST', credentials: 'same-origin',
@@ -2237,7 +2237,7 @@ function initAccount() {
               });
               if (!r.ok) { const d = await r.json(); throw new Error(d.detail || 'Failed'); }
               render2FA();
-            } catch (e) { msg.textContent = e.message; msg.style.color = 'var(--red)'; }
+            } catch (e) { msg.textContent = e.message; msg.style.color = 'var(--destructive)'; }
           });
         } else {
           // 2FA is OFF — show setup button
@@ -2274,7 +2274,7 @@ function initAccount() {
               el('tfa-verify-btn').addEventListener('click', async () => {
                 const code = el('tfa-verify-code').value.trim();
                 const vmsg = el('tfa-msg');
-                if (!code) { vmsg.textContent = 'Enter the code'; vmsg.style.color = 'var(--red)'; return; }
+                if (!code) { vmsg.textContent = 'Enter the code'; vmsg.style.color = 'var(--destructive)'; return; }
                 try {
                   const vr = await fetch('/api/auth/2fa/confirm', {
                     method: 'POST', credentials: 'same-origin',
@@ -2291,9 +2291,9 @@ function initAccount() {
                     <div style="font-family:monospace;font-size:12px;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;columns:2;column-gap:16px;margin-bottom:8px;">${codes.map(c => '<div style="margin-bottom:2px;">' + c + '</div>').join('')}</div>
                     <button class="admin-btn-add" id="tfa-done-btn">Done</button>`;
                   el('tfa-done-btn').addEventListener('click', () => render2FA());
-                } catch (e) { vmsg.textContent = e.message; vmsg.style.color = 'var(--red)'; }
+                } catch (e) { vmsg.textContent = e.message; vmsg.style.color = 'var(--destructive)'; }
               });
-            } catch (e) { msg.textContent = e.message; msg.style.color = 'var(--red)'; }
+            } catch (e) { msg.textContent = e.message; msg.style.color = 'var(--destructive)'; }
           });
         }
       } catch (_) {
@@ -2306,7 +2306,7 @@ function initAccount() {
   // Logout
   const logoutBtn = el('settings-logout-btn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('mouseenter', () => { logoutBtn.style.opacity = '1'; logoutBtn.style.borderColor = 'var(--red)'; logoutBtn.style.color = 'var(--red)'; });
+    logoutBtn.addEventListener('mouseenter', () => { logoutBtn.style.opacity = '1'; logoutBtn.style.borderColor = 'var(--red)'; logoutBtn.style.color = 'var(--destructive)'; });
     logoutBtn.addEventListener('mouseleave', () => { logoutBtn.style.opacity = ''; logoutBtn.style.borderColor = ''; logoutBtn.style.color = ''; });
     logoutBtn.addEventListener('click', async () => {
       try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (_) {}
@@ -2397,7 +2397,7 @@ async function initReminderSettings() {
             setTimeout(() => { pubUrlMsg.textContent = ''; }, 2000);
           }
         } catch (_) {
-          if (pubUrlMsg) { pubUrlMsg.textContent = 'Save failed'; pubUrlMsg.style.color = 'var(--red)'; }
+          if (pubUrlMsg) { pubUrlMsg.textContent = 'Save failed'; pubUrlMsg.style.color = 'var(--destructive)'; }
         }
       }, 600);
     });
@@ -2591,7 +2591,7 @@ async function initReminderSettings() {
   // regardless of channel). The hint should make that clear so
   // users don't think they have to choose between channels.
   const CHANNEL_HINTS = {
-    browser: 'Reminders appear as browser notifications inside Odysseus.',
+    browser: 'Reminders appear as browser notifications inside Ariadne.',
     email: 'Reminders are emailed and shown as a browser notification.',
     ntfy: 'Reminders are pushed via ntfy AND shown as a browser notification.',
     webhook: 'Reminders are POSTed to the selected integration AND shown as a browser notification. Use {{title}} and {{message}} in the payload template.',
@@ -2821,7 +2821,7 @@ async function initReminderSettings() {
           } catch {}
         }
       } catch (e) {
-        if (testMsg) { testMsg.textContent = 'Failed: ' + e.message; testMsg.style.color = 'var(--red)'; }
+        if (testMsg) { testMsg.textContent = 'Failed: ' + e.message; testMsg.style.color = 'var(--destructive)'; }
       } finally {
         _stopTestSpin();
         testBtn.disabled = false;
@@ -2991,7 +2991,7 @@ async function initEmailAccountsSettings() {
     const eafProviderNotes = {
       outlook: {
         title: 'Outlook / Office 365 needs OAuth',
-        body: 'Microsoft disables normal password login for IMAP/SMTP in most Outlook and Microsoft 365 accounts. Odysseus does not support Microsoft OAuth/Graph mail yet, so this preset is only a placeholder for future support.',
+        body: 'Microsoft disables normal password login for IMAP/SMTP in most Outlook and Microsoft 365 accounts. Ariadne does not support Microsoft OAuth/Graph mail yet, so this preset is only a placeholder for future support.',
       },
     };
     const eafNoteEl = el('eaf-provider-note');
@@ -3039,12 +3039,12 @@ async function initEmailAccountsSettings() {
         smtp_port: parseInt(el('eaf-smtp-port').value) || 587,
         smtp_user: el('eaf-imap-user').value.trim(),
       };
-      if (!body.name) { el('eaf-msg').textContent = 'Enter a Name or Email first'; el('eaf-msg').style.color = 'var(--red)'; return; }
+      if (!body.name) { el('eaf-msg').textContent = 'Enter a Name or Email first'; el('eaf-msg').style.color = 'var(--destructive)'; return; }
       const url = isEdit ? `/api/email/accounts/${a.id}` : '/api/email/accounts';
       const method = isEdit ? 'PUT' : 'POST';
       const r = await fetch(url, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
-      if (!d.ok) { el('eaf-msg').textContent = d.error || 'Save failed'; el('eaf-msg').style.color = 'var(--red)'; return; }
+      if (!d.ok) { el('eaf-msg').textContent = d.error || 'Save failed'; el('eaf-msg').style.color = 'var(--destructive)'; return; }
       const accId = isEdit ? a.id : d.id;
       window.location.href = `/api/email/oauth/google/authorize?account_id=${encodeURIComponent(accId)}`;
     });
@@ -3089,7 +3089,7 @@ async function initEmailAccountsSettings() {
       // Name is optional — fall back to the From address so the list view
       // still has a label to render. Only refuse if both are blank.
       if (!body.name) body.name = body.from_address;
-      if (!body.name) { el('eaf-msg').textContent = 'Need at least a Name or Email'; el('eaf-msg').style.color = 'var(--red)'; return; }
+      if (!body.name) { el('eaf-msg').textContent = 'Need at least a Name or Email'; el('eaf-msg').style.color = 'var(--destructive)'; return; }
 
       try {
         const url = isEdit ? `/api/email/accounts/${a.id}` : '/api/email/accounts';
@@ -3106,11 +3106,11 @@ async function initEmailAccountsSettings() {
           setTimeout(() => { formEl.style.display = 'none'; renderList(); }, 400);
         } else {
           el('eaf-msg').textContent = d.error || 'Save failed';
-          el('eaf-msg').style.color = 'var(--red)';
+          el('eaf-msg').style.color = 'var(--destructive)';
         }
       } catch (e) {
         el('eaf-msg').textContent = 'Error: ' + e.message;
-        el('eaf-msg').style.color = 'var(--red)';
+        el('eaf-msg').style.color = 'var(--destructive)';
       }
     });
   }
@@ -3427,8 +3427,8 @@ async function initIntegrations() {
     };
     if (presetSel.value) payload.preset = presetSel.value;
     if (keyIn.value.trim()) payload.api_key = keyIn.value.trim();
-    if (!payload.name) { statusEl.textContent = 'Name required'; statusEl.style.color = 'var(--red)'; return; }
-    if (!payload.base_url) { statusEl.textContent = 'URL required'; statusEl.style.color = 'var(--red)'; return; }
+    if (!payload.name) { statusEl.textContent = 'Name required'; statusEl.style.color = 'var(--destructive)'; return; }
+    if (!payload.base_url) { statusEl.textContent = 'URL required'; statusEl.style.color = 'var(--destructive)'; return; }
 
     try {
       const url = editingId ? `/api/auth/integrations/${editingId}` : '/api/auth/integrations';
@@ -3443,11 +3443,11 @@ async function initIntegrations() {
       } else {
         const err = await res.json().catch(() => ({}));
         statusEl.textContent = err.detail || 'Save failed';
-        statusEl.style.color = 'var(--red)';
+        statusEl.style.color = 'var(--destructive)';
       }
     } catch (e) {
       statusEl.textContent = 'Error saving';
-      statusEl.style.color = 'var(--red)';
+      statusEl.style.color = 'var(--destructive)';
     }
   });
 
@@ -3463,7 +3463,7 @@ async function initIntegrations() {
       statusEl.style.color = data.ok ? 'var(--green, #98c379)' : 'var(--red)';
     } catch (e) {
       statusEl.textContent = 'Connection failed';
-      statusEl.style.color = 'var(--red)';
+      statusEl.style.color = 'var(--destructive)';
     }
   });
 
@@ -3673,7 +3673,7 @@ async function initUnifiedIntegrations() {
         <div style="font-size:11px;opacity:0.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.detail || ''}</div>
       </div>
       ${statusDot}
-      <button class="admin-btn-sm intg-del-btn" data-intg-id="${item.id}" data-intg-type="${item.type}" data-intg-name="${(item.name || '').replace(/"/g, '&quot;')}" title="Remove" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--red);opacity:0.55;display:inline-flex;align-items:center;justify-content:center;">
+      <button class="admin-btn-sm intg-del-btn" data-intg-id="${item.id}" data-intg-type="${item.type}" data-intg-name="${(item.name || '').replace(/"/g, '&quot;')}" title="Remove" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--destructive);opacity:0.55;display:inline-flex;align-items:center;justify-content:center;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
     </div>`;
@@ -3889,7 +3889,7 @@ async function initUnifiedIntegrations() {
       if (ntfyHint) {
         ntfyHint.style.display = isNtfy ? 'block' : 'none';
         if (isNtfy) {
-          ntfyHint.innerHTML = 'Enter the ntfy server URL Odysseus can reach. Examples: <code>http://127.0.0.1:8091</code>, <code>http://100.x.y.z:8091</code>, or <code>https://ntfy.example.com</code>.';
+          ntfyHint.innerHTML = 'Enter the ntfy server URL Ariadne can reach. Examples: <code>http://127.0.0.1:8091</code>, <code>http://100.x.y.z:8091</code>, or <code>https://ntfy.example.com</code>.';
         }
       }
       if (url) {
@@ -3915,8 +3915,8 @@ async function initUnifiedIntegrations() {
       const presetKey = preset.value || undefined;
       const nameValue = name.value.trim();
       const urlValue = url.value.trim();
-      if (!nameValue) { el('uf-api-msg').textContent = 'Name required'; el('uf-api-msg').style.color = 'var(--red)'; return; }
-      if (!urlValue) { el('uf-api-msg').textContent = 'Base URL required'; el('uf-api-msg').style.color = 'var(--red)'; return; }
+      if (!nameValue) { el('uf-api-msg').textContent = 'Name required'; el('uf-api-msg').style.color = 'var(--destructive)'; return; }
+      if (!urlValue) { el('uf-api-msg').textContent = 'Base URL required'; el('uf-api-msg').style.color = 'var(--destructive)'; return; }
       const body = { name: nameValue, base_url: urlValue, auth_type: auth.value, auth_header: header.value, preset: presetKey };
       if (key.value) body.api_key = key.value;
       try {
@@ -3934,7 +3934,7 @@ async function initUnifiedIntegrations() {
         el('uf-api-msg').textContent = 'Saved'; el('uf-api-msg').style.color = 'var(--green,#50fa7b)';
         await renderList();
         notifyIntegrationsChanged();
-      } catch (_) { el('uf-api-msg').textContent = 'Failed'; el('uf-api-msg').style.color = 'var(--red)'; }
+      } catch (_) { el('uf-api-msg').textContent = 'Failed'; el('uf-api-msg').style.color = 'var(--destructive)'; }
     });
     el('uf-api-test').addEventListener('click', async () => {
       if (!_editId) { el('uf-api-msg').textContent = 'Save first'; return; }
@@ -3947,9 +3947,9 @@ async function initUnifiedIntegrations() {
           el('uf-api-msg').style.color = 'var(--green,#50fa7b)';
         } else {
           el('uf-api-msg').textContent = (d.message || d.error || d.detail || `HTTP ${r.status}`).slice(0, 360);
-          el('uf-api-msg').style.color = 'var(--red)';
+          el('uf-api-msg').style.color = 'var(--destructive)';
         }
-      } catch (e) { el('uf-api-msg').textContent = 'Error: ' + e.message; el('uf-api-msg').style.color = 'var(--red)'; }
+      } catch (e) { el('uf-api-msg').textContent = 'Error: ' + e.message; el('uf-api-msg').style.color = 'var(--destructive)'; }
     });
   }
 
@@ -4130,7 +4130,7 @@ async function initUnifiedIntegrations() {
         notifyIntegrationsChanged();
       } catch (_) {
         el('uf-carddav-msg').textContent = 'Failed';
-        el('uf-carddav-msg').style.color = 'var(--red)';
+        el('uf-carddav-msg').style.color = 'var(--destructive)';
       }
     });
     // Add-row toggle + save
@@ -4489,7 +4489,7 @@ async function initUnifiedIntegrations() {
       },
       outlook: {
         title: 'Outlook / Office 365 needs OAuth',
-        body: 'Microsoft disables normal password login for IMAP/SMTP in most Outlook and Microsoft 365 accounts. Odysseus does not support Microsoft OAuth/Graph mail yet, so this preset is only a placeholder for future support.',
+        body: 'Microsoft disables normal password login for IMAP/SMTP in most Outlook and Microsoft 365 accounts. Ariadne does not support Microsoft OAuth/Graph mail yet, so this preset is only a placeholder for future support.',
         url: 'https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/disable-basic-authentication-in-exchange-online',
         linkLabel: 'Read Microsoft note',
       },
@@ -4650,12 +4650,12 @@ async function initUnifiedIntegrations() {
     el('uf-oauth-btn').addEventListener('click', async () => {
       const body = _collectBody();
       if (!body.name) body.name = body.from_address;
-      if (!body.name) { el('uf-email-msg').textContent = 'Enter a Name or Email first'; el('uf-email-msg').style.color = 'var(--red)'; return; }
+      if (!body.name) { el('uf-email-msg').textContent = 'Enter a Name or Email first'; el('uf-email-msg').style.color = 'var(--destructive)'; return; }
       const url = isEdit ? `/api/email/accounts/${editId}` : '/api/email/accounts';
       const method = isEdit ? 'PUT' : 'POST';
       const r = await fetch(url, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
-      if (!(d.ok || d.id)) { el('uf-email-msg').textContent = d.error || 'Save failed'; el('uf-email-msg').style.color = 'var(--red)'; return; }
+      if (!(d.ok || d.id)) { el('uf-email-msg').textContent = d.error || 'Save failed'; el('uf-email-msg').style.color = 'var(--destructive)'; return; }
       const accId = isEdit ? editId : d.id;
       window.location.href = `/api/email/oauth/google/authorize?account_id=${encodeURIComponent(accId)}`;
     });
@@ -4806,7 +4806,7 @@ async function initUnifiedIntegrations() {
           const imap = d.imap?.ok ? 'IMAP ok' : `IMAP: ${d.imap?.error || 'fail'}`;
           const smtp = d.smtp ? (d.smtp.ok ? ' · SMTP ok' : ` · SMTP: ${d.smtp.error || 'fail'}`) : '';
           msg.textContent = imap + smtp;
-          msg.style.color = 'var(--red)';
+          msg.style.color = 'var(--destructive)';
         }
       } catch (e) {
         btn.style.background = 'var(--red)';
@@ -4814,7 +4814,7 @@ async function initUnifiedIntegrations() {
         btn.style.color = '#fff';
         ico.innerHTML = btn.dataset.origIco;
         msg.textContent = 'Test error: ' + e.message;
-        msg.style.color = 'var(--red)';
+        msg.style.color = 'var(--destructive)';
       } finally {
         btn.disabled = false;
       }
@@ -4824,7 +4824,7 @@ async function initUnifiedIntegrations() {
       const body = _collectBody();
       // Name is optional — fall back to Email so the list still has a label.
       if (!body.name) body.name = body.from_address;
-      if (!body.name) { el('uf-email-msg').textContent = 'Need at least a Name or Email'; el('uf-email-msg').style.color = 'var(--red)'; return; }
+      if (!body.name) { el('uf-email-msg').textContent = 'Need at least a Name or Email'; el('uf-email-msg').style.color = 'var(--destructive)'; return; }
       const saveBtn = el('uf-email-save');
       saveBtn.disabled = true;
       const saveIcoEl = saveBtn.querySelector('.uf-email-save-ico');
@@ -4844,7 +4844,7 @@ async function initUnifiedIntegrations() {
         const d = await r.json();
         if (!(d.ok || d.id)) {
           el('uf-email-msg').textContent = d.error || 'Failed';
-          el('uf-email-msg').style.color = 'var(--red)';
+          el('uf-email-msg').style.color = 'var(--destructive)';
           return;
         }
         el('uf-email-msg').textContent = 'Saved';
@@ -4855,7 +4855,7 @@ async function initUnifiedIntegrations() {
         notifyIntegrationsChanged();
       } catch (e) {
         el('uf-email-msg').textContent = 'Error: ' + e.message;
-        el('uf-email-msg').style.color = 'var(--red)';
+        el('uf-email-msg').style.color = 'var(--destructive)';
       } finally {
         saveBtn.disabled = false;
         saveIcoEl.innerHTML = prevIco;
@@ -5309,7 +5309,7 @@ async function initUnifiedIntegrations() {
               </button>
             </div>
             <div id="uf-codex-config-body" style="display:none;">
-              <div style="font-size:11px;opacity:0.62;margin:4px 0 6px;">Toggle which Odysseus tools this agent can use. New agents start with chat only.</div>
+              <div style="font-size:11px;opacity:0.62;margin:4px 0 6px;">Toggle which Ariadne tools this agent can use. New agents start with chat only.</div>
               <div id="uf-codex-inline-scopes"></div>
             </div>
           </div>
@@ -5379,7 +5379,7 @@ async function initUnifiedIntegrations() {
             notifyIntegrationsChanged();
           } catch (err) {
             cb.checked = !cb.checked;
-            if (msg) { msg.textContent = (err && err.message) || 'Failed'; msg.style.color = 'var(--red)'; }
+            if (msg) { msg.textContent = (err && err.message) || 'Failed'; msg.style.color = 'var(--destructive)'; }
           }
         });
       });
@@ -5420,7 +5420,7 @@ async function initUnifiedIntegrations() {
         await renderList();
         setTimeout(() => { formEl.style.display = 'none'; }, 350);
       } catch (err) {
-        if (msg) { msg.textContent = err?.message || 'Save failed'; msg.style.color = 'var(--red)'; }
+        if (msg) { msg.textContent = err?.message || 'Save failed'; msg.style.color = 'var(--destructive)'; }
       }
     });
 
@@ -5441,7 +5441,7 @@ async function initUnifiedIntegrations() {
         await renderList();
         setTimeout(() => { formEl.style.display = 'none'; }, 350);
       } catch (err) {
-        if (msg) { msg.textContent = err?.message || 'Revoke failed'; msg.style.color = 'var(--red)'; }
+        if (msg) { msg.textContent = err?.message || 'Revoke failed'; msg.style.color = 'var(--destructive)'; }
       }
     });
 
@@ -5524,7 +5524,7 @@ async function initUnifiedIntegrations() {
         if (pending) pending.style.display = 'none';
         if (msg) {
           msg.textContent = err?.message || 'Failed';
-          msg.style.color = 'var(--red)';
+          msg.style.color = 'var(--destructive)';
         }
       }
     };
@@ -5623,7 +5623,7 @@ async function initUnifiedIntegrations() {
             await renderList();
           } catch (err) {
             cb.checked = !cb.checked;
-            if (msg) { msg.textContent = err?.message || 'Failed'; msg.style.color = 'var(--red)'; }
+            if (msg) { msg.textContent = err?.message || 'Failed'; msg.style.color = 'var(--destructive)'; }
           }
         });
       });

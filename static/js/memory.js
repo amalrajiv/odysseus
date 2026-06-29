@@ -690,15 +690,17 @@ export function renderMemoryList() {
     if (selectBtn) selectBtn.disabled = true;
     if (selectMode) exitSelectMode();
     const searchTerm = document.getElementById('memory-search')?.value?.trim() || '';
-    const _smiley = '<span style="vertical-align:-3px;margin-left:6px;">' + uiModule.emptyStateIcon('smiley') + '</span>';
     if (searchTerm || activeCategory !== 'all') {
-      memoryList.innerHTML = `<div class="memory-empty">No matches.</div>`;
+      memoryList.innerHTML = `<div class="ax-empty">
+        <div class="ax-empty-title">No matches</div>
+        <div class="ax-empty-desc">Try a different search term or category.</div>
+      </div>`;
     } else {
-      memoryList.innerHTML = `<div class="memory-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-        <span>No memories yet${_smiley}</span>
-        <span style="opacity:0.7;font-size:11px;display:block;">
-          <a href="#" data-mem-goto-add style="color:var(--accent,var(--red));text-decoration:underline;">Import in Add tab</a>
-        </span>
+      memoryList.innerHTML = `<div class="ax-empty">
+        <div class="ax-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></svg></div>
+        <div class="ax-empty-title">No memories yet</div>
+        <div class="ax-empty-desc">Things Ariadne remembers about you will show up here.</div>
+        <div class="ax-empty-actions"><a href="#" class="ax-btn ax-btn-sm ax-btn-subtle" data-mem-goto-add>Import in Add tab</a></div>
       </div>`;
       memoryList.querySelector('[data-mem-goto-add]')?.addEventListener('click', (e) => {
         e.preventDefault();

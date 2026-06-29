@@ -97,7 +97,12 @@ function _showNotesFirstOpenHint(pane) {
   const place = () => {
     const r = pane.getBoundingClientRect();
     const hw = hint.offsetWidth || 260;
-    hint.style.top = Math.max(12, r.top + 58) + 'px';
+    const hh = hint.offsetHeight || 80;
+    // Anchor near the BOTTOM-left of the pane (not just under the header) so the
+    // bubble never sits on top of the header / "+ add" / filter controls. Clamp
+    // to the viewport so it stays fully on-screen for short panes too.
+    const top = Math.min(window.innerHeight - hh - 12, Math.max(12, r.bottom - hh - 16));
+    hint.style.top = top + 'px';
     hint.style.left = Math.min(window.innerWidth - hw - 12, Math.max(12, r.left + 18)) + 'px';
   };
   const close = () => {

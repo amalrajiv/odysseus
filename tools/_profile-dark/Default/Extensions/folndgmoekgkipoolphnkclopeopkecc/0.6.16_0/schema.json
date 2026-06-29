@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "urlTemplate": {
+      "type": "string",
+      "description": "A URL template for service endpoints."
+    },
+    "registrationIdentity": {
+      "type": "string",
+      "description": "Encrypted token used to register the device."
+    },
+    "userId": {
+      "type": "string",
+      "description": "A user identifier, e.g. username or email."
+    },
+    "userFullName": {
+      "type": "string",
+      "description": "A full name for the user."
+    },
+    "hostname": {
+      "type": "string",
+      "description": "Hostname of the device."
+    }
+  },
+  "required": ["urlTemplate","registrationIdentity"]
+}

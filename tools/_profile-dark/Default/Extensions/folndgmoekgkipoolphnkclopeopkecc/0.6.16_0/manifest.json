@@ -1,0 +1,51 @@
+{
+   "action": {
+      "default_popup": "popup.html",
+      "default_title": "CrowdStrike AIDR"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "browser_specific_settings": {
+      "gecko": {
+         "data_collection_permissions": {
+            "optional": [  ],
+            "required": [ "personallyIdentifyingInfo", "personalCommunications", "browsingActivity", "websiteContent" ]
+         },
+         "id": "pangea-aidr-extension@pangea.cloud",
+         "update_url": "https://pangea.cloud/firefox-aidr-extension/updates.json"
+      }
+   },
+   "content_scripts": [ {
+      "js": [ "content-scripts/content.js" ],
+      "matches": [ "*://*.atlassian.net/*", "*://*.chatgot.io/*", "*://*.chatgpt.com/*", "*://*.claude.ai/*", "*://*.copilot.com/*", "*://*.dopple.ai/*", "*://*.gemini.google.com/*", "*://*.lightning.force.com/*", "*://*.mistral.ai/*", "*://aistudio.google.com/*", "*://anonchatgpt.com/*", "*://app.copy.ai/*", "*://app.glean.com/*", "*://app.sigmabrowser.com/*", "*://character.ai/*", "*://charstar.ai/*", "*://chat.deepseek.com/*", "*://chat.kuki.ai/*", "*://copilot.microsoft.com/*", "*://deftgpt.com/*", "*://flowgpt.com/*", "*://gptonline.ai/*", "*://grok.com/*", "*://iask.ai/*", "*://m365.cloud.microsoft/chat/*", "*://meta.ai/*", "*://mistral.ai/*", "*://openart.ai/*", "*://pi.ai/*", "*://poe.com/*", "*://www.askan.ai/*", "*://www.dall-efree.com/*", "*://www.hereforyou.app/*", "*://www.joyland.ai/*", "*://www.meta.ai/*", "*://www.notion.so/*", "*://www.perplexity.ai/*", "*://www.phind.com/*", "*://www.sakura.fm/*", "*://yodayo.com/*", "*://you.com/*" ]
+   } ],
+   "description": "Monitor, redact, and block prompts to AI Chat sites.",
+   "externally_connectable": {
+      "ids": [ "gppamppofhecmnlhmhdobepbifmpafmp", "inchpeenfiiokieokmokdohfdahhpnnm", "klicnoclcmhafeeepkpdedpojjlaaflf" ]
+   },
+   "host_permissions": [ "*://*.chatgpt.com/*", "*://*.chatgot.io/*", "*://*.claude.ai/*" ],
+   "icons": {
+      "128": "icon/128.png",
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png",
+      "96": "icon/96.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAndqmg1inkqllJ1OJVgkwD0srvzynA0L/BrWZaCrowSAv+DW10+uab+iNB7lW3qSBNrgGkZ0mgm9JgSqFbF1j1SvrG4/qwDRkqQ2BXbQbCS3ceFjiZy7mEQZxDCGl8ZwKyLlxLz70wxZWyOtKr223cf6Szw7r4ooP8qW0Pbh9aab+obtNjNaxRVN3lORjpgIKYzs+m8BNYrR3lKZ20UbitLWGwT88vFyQBHp/cHTibpTUi0422+PuEfjqgqpiKNw70h3xoKZsgujXjTL39yjsBOS8K8OpvZyM/9bd54qSvouMcE4a4V6mzYjF3Fz8WiiNz1ao3Z2oyjz+/gwix+JXTQIDAQAB",
+   "manifest_version": 3,
+   "name": "AIDR (Chrome Store)",
+   "permissions": [ "alarms", "storage", "tabs", "webRequest" ],
+   "storage": {
+      "managed_schema": "schema.json"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.6.16",
+   "web_accessible_resources": [ {
+      "matches": [ "*://*/*" ],
+      "resources": [ "capture.js" ]
+   }, {
+      "matches": [ "*://*.atlassian.net/*", "*://*.chatgot.io/*", "*://*.chatgpt.com/*", "*://*.claude.ai/*", "*://*.copilot.com/*", "*://*.dopple.ai/*", "*://*.gemini.google.com/*", "*://*.lightning.force.com/*", "*://*.mistral.ai/*", "*://aistudio.google.com/*", "*://anonchatgpt.com/*", "*://app.copy.ai/*", "*://app.glean.com/*", "*://app.sigmabrowser.com/*", "*://character.ai/*", "*://charstar.ai/*", "*://chat.deepseek.com/*", "*://chat.kuki.ai/*", "*://copilot.microsoft.com/*", "*://deftgpt.com/*", "*://flowgpt.com/*", "*://gptonline.ai/*", "*://grok.com/*", "*://iask.ai/*", "*://m365.cloud.microsoft/*", "*://meta.ai/*", "*://mistral.ai/*", "*://openart.ai/*", "*://pi.ai/*", "*://poe.com/*", "*://www.askan.ai/*", "*://www.dall-efree.com/*", "*://www.hereforyou.app/*", "*://www.joyland.ai/*", "*://www.meta.ai/*", "*://www.notion.so/*", "*://www.perplexity.ai/*", "*://www.phind.com/*", "*://www.sakura.fm/*", "*://yodayo.com/*", "*://you.com/*" ],
+      "resources": [ "content-scripts/content.css" ]
+   } ]
+}

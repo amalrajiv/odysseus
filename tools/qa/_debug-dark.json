@@ -1,0 +1,56 @@
+{
+  "bodyClass": "",
+  "innerTextLen": 300,
+  "center": {
+    "tag": "DIV",
+    "id": "loader-wave",
+    "cls": ""
+  },
+  "covers": [
+    {
+      "id": "app-loader",
+      "cls": "",
+      "z": "99999",
+      "op": "1"
+    }
+  ],
+  "shell": {
+    "sidebar": {
+      "x": 48,
+      "y": 0,
+      "w": 240,
+      "h": 900,
+      "disp": "flex",
+      "op": "1",
+      "vis": "visible"
+    },
+    "inputBar": {
+      "x": 464,
+      "y": 528,
+      "w": 800,
+      "h": 102,
+      "disp": "flex",
+      "op": "1",
+      "vis": "visible"
+    },
+    "chatHistory": {
+      "x": 304,
+      "y": 33,
+      "w": 1120,
+      "h": 487,
+      "disp": "block",
+      "op": "1",
+      "vis": "visible"
+    },
+    "topBar": null,
+    "hamburger": {
+      "x": 9,
+      "y": 12,
+      "w": 30,
+      "h": 30,
+      "disp": "flex",
+      "op": "0.5",
+      "vis": "visible"
+    }
+  }
+}

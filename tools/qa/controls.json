@@ -1,0 +1,372 @@
+[
+  {
+    "tag": "button",
+    "id": "hamburger-btn",
+    "cls": "hamburger-btn",
+    "label": "Show sidebar",
+    "x": 9,
+    "y": 12,
+    "w": 30,
+    "h": 30
+  },
+  {
+    "tag": "button",
+    "id": "rail-search-btn",
+    "cls": "icon-rail-btn",
+    "label": "Search conversations (Ctrl+K)",
+    "x": 7,
+    "y": 48,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-new-session",
+    "cls": "icon-rail-btn rail-new-chat",
+    "label": "New chat",
+    "x": 7,
+    "y": 86,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-delete-session",
+    "cls": "icon-rail-btn",
+    "label": "Delete session",
+    "x": 7,
+    "y": 124,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-calendar",
+    "cls": "icon-rail-btn",
+    "label": "Calendar",
+    "x": 7,
+    "y": 175,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-compare",
+    "cls": "icon-rail-btn",
+    "label": "Compare",
+    "x": 7,
+    "y": 213,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-cookbook",
+    "cls": "icon-rail-btn",
+    "label": "Cookbook",
+    "x": 7,
+    "y": 251,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-research",
+    "cls": "icon-rail-btn",
+    "label": "Deep Research",
+    "x": 7,
+    "y": 289,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-email",
+    "cls": "icon-rail-btn",
+    "label": "Email",
+    "x": 7,
+    "y": 327,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-gallery",
+    "cls": "icon-rail-btn",
+    "label": "Gallery",
+    "x": 7,
+    "y": 365,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-archive",
+    "cls": "icon-rail-btn",
+    "label": "Library",
+    "x": 7,
+    "y": 403,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-memory",
+    "cls": "icon-rail-btn",
+    "label": "Brain",
+    "x": 7,
+    "y": 441,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-notes",
+    "cls": "icon-rail-btn",
+    "label": "Notes",
+    "x": 7,
+    "y": 479,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-tasks",
+    "cls": "icon-rail-btn",
+    "label": "Tasks",
+    "x": 7,
+    "y": 517,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-theme",
+    "cls": "icon-rail-btn",
+    "label": "Theme",
+    "x": 7,
+    "y": 555,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "button",
+    "id": "rail-settings",
+    "cls": "icon-rail-btn",
+    "label": "Settings",
+    "x": 7,
+    "y": 858,
+    "w": 34,
+    "h": 34
+  },
+  {
+    "tag": "nav",
+    "id": "sidebar",
+    "cls": "sidebar",
+    "label": "Sidebar",
+    "x": 48,
+    "y": 0,
+    "w": 240,
+    "h": 900
+  },
+  {
+    "tag": "button",
+    "id": "chats-library-btn",
+    "cls": "section-header-btn list-item-plus-btn chats-manage-btn",
+    "label": "Manage Chats (Library)",
+    "x": 230,
+    "y": 119,
+    "w": 23,
+    "h": 14
+  },
+  {
+    "tag": "button",
+    "id": "session-sort-btn",
+    "cls": "section-header-btn",
+    "label": "Sort sessions",
+    "x": 253,
+    "y": 119,
+    "w": 18,
+    "h": 14
+  },
+  {
+    "tag": "button",
+    "id": "email-compose-btn",
+    "cls": "section-header-btn list-item-plus-btn",
+    "label": "Compose email",
+    "x": 254,
+    "y": 150,
+    "w": 21,
+    "h": 14
+  },
+  {
+    "tag": "button",
+    "id": "model-sort-btn",
+    "cls": "section-header-btn",
+    "label": "Sort models",
+    "x": 253,
+    "y": 181,
+    "w": 18,
+    "h": 14
+  },
+  {
+    "tag": "select",
+    "id": "model-select",
+    "cls": "",
+    "label": "Select model",
+    "x": 62,
+    "y": 211,
+    "w": 160,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "btn-model-chat",
+    "cls": "model-chat-btn",
+    "label": "Add model chat",
+    "x": 228,
+    "y": 215,
+    "w": 46,
+    "h": 24
+  },
+  {
+    "tag": "button",
+    "id": "library-new-doc-btn",
+    "cls": "list-item-plus-btn",
+    "label": "New document",
+    "x": 254,
+    "y": 472,
+    "w": 21,
+    "h": 14
+  },
+  {
+    "tag": "button",
+    "id": "user-bar-settings",
+    "cls": "user-bar-btn",
+    "label": "Settings",
+    "x": 247,
+    "y": 853,
+    "w": 28,
+    "h": 32
+  },
+  {
+    "tag": "main",
+    "id": "chat-container",
+    "cls": "chat-container welcome-active",
+    "label": "Chat area",
+    "x": 288,
+    "y": 8,
+    "w": 1152,
+    "h": 892
+  },
+  {
+    "tag": "button",
+    "id": "export-dl-btn",
+    "cls": "export-dl-btn",
+    "label": "More",
+    "x": 898,
+    "y": 3,
+    "w": 23,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "incognito-btn",
+    "cls": "incognito-btn",
+    "label": "Enable Nobody mode — no memory, no histo",
+    "x": 819,
+    "y": 413,
+    "w": 89,
+    "h": 32
+  },
+  {
+    "tag": "textarea",
+    "id": "message",
+    "cls": "",
+    "label": "Message input",
+    "x": 477,
+    "y": 539,
+    "w": 774,
+    "h": 24
+  },
+  {
+    "tag": "button",
+    "id": "model-picker-btn",
+    "cls": "model-picker-btn",
+    "label": "Switch model",
+    "x": 1155,
+    "y": 541,
+    "w": 96,
+    "h": 21
+  },
+  {
+    "tag": "button",
+    "id": "overflow-plus-btn",
+    "cls": "input-icon-btn overflow-plus-btn",
+    "label": "More tools",
+    "x": 477,
+    "y": 587,
+    "w": 28,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "web-toggle-btn",
+    "cls": "input-icon-btn",
+    "label": "Web search",
+    "x": 509,
+    "y": 587,
+    "w": 28,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "bash-toggle-btn",
+    "cls": "input-icon-btn",
+    "label": "Shell access",
+    "x": 541,
+    "y": 587,
+    "w": 28,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "mode-agent-btn",
+    "cls": "mode-toggle-btn active",
+    "label": "Agent",
+    "x": 1114,
+    "y": 590,
+    "w": 51,
+    "h": 26
+  },
+  {
+    "tag": "button",
+    "id": "mode-chat-btn",
+    "cls": "mode-toggle-btn",
+    "label": "Chat",
+    "x": 1165,
+    "y": 590,
+    "w": 45,
+    "h": 26
+  },
+  {
+    "tag": "button",
+    "id": "",
+    "cls": "send-btn newchat-mode",
+    "label": "New chat",
+    "x": 1219,
+    "y": 587,
+    "w": 32,
+    "h": 32
+  },
+  {
+    "tag": "button",
+    "id": "scroll-bottom-btn",
+    "cls": "scroll-nav-btn",
+    "label": "Scroll to bottom",
+    "x": 1218,
+    "y": 474,
+    "w": 38,
+    "h": 38
+  }
+]

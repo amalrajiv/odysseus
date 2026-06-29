@@ -9,6 +9,15 @@ import { makeWindowDraggable } from './windowDrag.js';
 import { snapModalToZone } from './tileManager.js';
 
 export const THEMES = {
+  // Ariadne — premium neutral dark default (matches the design-token defaults
+  // in style.css). Indigo accent, near-black surfaces, AA contrast.
+  ariadne:    { bg:'#111114', fg:'#e7e7ec', panel:'#17171c', border:'#26262e', red:'#4f46e5' },
+  // Daylight — the premium LIGHT counterpart to Ariadne (near-white surfaces,
+  // ink-dark text, the same indigo accent). This is the real, live light path:
+  // applied as inline theme vars so every color-mix token recomputes for light.
+  // (Replaces the old dead `:root.light` block in style.css.)
+  daylight:   { bg:'#fbfbfc', fg:'#1b1b1f', panel:'#ffffff', border:'#e5e5ea', red:'#4f46e5' },
+  // Classic Odysseus cyan — kept as a selectable preset.
   dark:       { bg:'#282c34', fg:'#9cdef2', panel:'#111111', border:'#355a66', red:'#e06c75' },
   light:      { bg:'#f0ebe3', fg:'#5a5248', panel:'#faf6f0', border:'#d4cdc2', red:'#c47d5a' },
   midnight:   { bg:'#0d1117', fg:'#c9d1d9', panel:'#161b22', border:'#30363d', red:'#f85149' },
@@ -31,23 +40,24 @@ export const THEMES = {
   cute:       { bg:'#fff0f5', fg:'#d4608a', panel:'#fff8fa', border:'#f0c0d0', red:'#ff6b9d' },
 };
 
-const DEFAULT_THEME = 'dark';
+const DEFAULT_THEME = 'ariadne';
 const LS_KEY = 'odysseus-theme';
 const CUSTOM_THEMES_KEY = 'odysseus-custom-themes';
 
 const FONT_MAP = {
-  mono: "'Fira Code', monospace",
-  sans: "system-ui, -apple-system, 'Segoe UI', sans-serif",
+  sans: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+  mono: "'Fira Code', ui-monospace, monospace",
   serif: "Georgia, 'Times New Roman', serif",
   opendyslexic: "'OpenDyslexic', sans-serif",
 };
-const DEFAULT_FONT = 'mono';
+const DEFAULT_FONT = 'sans';
 const DEFAULT_DENSITY = 'comfortable';
 const MAX_CUSTOM_THEMES = 8;
 
 // Default background patterns for built-in themes
 const THEME_DEFAULT_PATTERN = {
   dark:       'none',
+  daylight:   'none',
   light:      'dots',
   midnight:   'rain',
   paper:      'dots',
@@ -184,7 +194,7 @@ const ADV_KEYS = [
   { key: 'aiBubbleBg',         css: '--ai-bubble-bg',      label: 'AI Chat Bubble',   group: 'Chat Bubbles' },
   { key: 'bubbleBorder',       css: '--bubble-border',     label: 'Border Chat Bubble', group: 'Chat Bubbles' },
   { key: 'sidebarBg',          css: '--sidebar-bg',        label: 'Sidebar Bg',       group: 'Sidebar' },
-  { key: 'brandColor',         css: '--brand-color',       label: 'Odysseus Logo',    group: 'Sidebar' },
+  { key: 'brandColor',         css: '--brand-color',       label: 'Ariadne Logo',    group: 'Sidebar' },
   { key: 'brandMixTo',         css: '--brand-mix-to',      label: 'Logo Gradient End', group: 'Sidebar' },
   { key: 'hamburgerColor',     css: '--hamburger-color',   label: 'Hamburger Menu',   group: 'Sidebar' },
   { key: 'inputBg',            css: '--input-bg',          label: 'Input Bg',         group: 'Chat Input / Prompt Area' },
@@ -336,7 +346,7 @@ function _updateFavicon(fg) {
   if (routeShape) {
     svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>${routeShape.split('__C__').join(fg)}</svg>`;
   } else {
-    svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 4L16 22L6 22Z' fill='${fg}'/><path d='M16 8L16 22L24 22Z' fill='${fg}' opacity='0.6'/><path d='M4 24Q10 20 16 24Q22 28 28 24' stroke='${fg}' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>`;
+    svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M24 4 L4 4 L4 28 L28 28 L28 10 L12 10 L12 22 L22 22 L22 16 L16 16' fill='none' stroke='${fg}' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/><circle cx='16' cy='16' r='2.1' fill='${fg}'/></svg>`;
   }
   const href = 'data:image/svg+xml,' + encodeURIComponent(svg);
   let link = document.querySelector("link[rel='icon']");
@@ -947,8 +957,8 @@ export function initThemeUI() {
       if (ds) ds.value = DEFAULT_DENSITY;
       if (ps) ps.value = 'none';
       grid.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
-      const darkSwatch = grid.querySelector('[data-theme="dark"]');
-      if (darkSwatch) darkSwatch.classList.add('active');
+      const defaultSwatch = grid.querySelector(`[data-theme="${DEFAULT_THEME}"]`);
+      if (defaultSwatch) defaultSwatch.classList.add('active');
     });
   }
 

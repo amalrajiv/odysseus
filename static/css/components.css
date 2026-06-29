@@ -1,0 +1,390 @@
+/* ============================================================
+   Ariadne — Component Layer (.ax-*)
+   A small, dependency-free component system modelled on shadcn/ui's
+   anatomy and visual language, built entirely on the design tokens in
+   style.css (:root). No build step, no framework.
+
+   Loaded AFTER style.css so the conservative shared-shell refinements at
+   the bottom override the legacy base without fighting higher-specificity
+   per-feature rules.
+
+   Adopt incrementally:  <button class="ax-btn ax-btn-primary">Save</button>
+   ============================================================ */
+
+/* ── Button ───────────────────────────────────────────────── */
+/* Legacy bridge: the dialog-button family (.confirm-btn / -primary / -secondary
+   / -danger) is used ~80x across 9 files incl. a build artifact, so rather than
+   rename every call site we converge those classes onto the ax-btn ruleset here
+   (sized to ax-btn-sm to stay close to the prior dimensions). Single source of
+   truth for button styling; the duplicate legacy declarations in style.css are
+   removed. Markup keeps saying .confirm-btn. */
+.ax-btn,
+.confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--elevated);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+.ax-btn:hover { background: color-mix(in srgb, var(--elevated) 70%, var(--foreground) 8%); }
+.ax-btn:active,
+.confirm-btn:active { transform: translateY(0.5px); }
+.ax-btn:disabled,
+.ax-btn[aria-disabled="true"],
+.confirm-btn:disabled,
+.confirm-btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.ax-btn:focus-visible,
+.confirm-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+}
+.ax-btn svg { width: 16px; height: 16px; flex: none; }
+
+/* Variants (legacy .confirm-btn-* grouped onto the matching ax variant) */
+.ax-btn-primary,
+.confirm-btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-semibold);
+}
+.ax-btn-primary:hover,
+.confirm-btn-primary:hover { background: var(--primary-hover); }
+
+.ax-btn-secondary,
+.confirm-btn-secondary {
+  background: var(--muted);
+  color: var(--foreground);
+  border-color: var(--border-subtle);
+}
+.ax-btn-secondary:hover,
+.confirm-btn-secondary:hover { background: var(--elevated); }
+
+.ax-btn-outline {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+.ax-btn-outline:hover { background: var(--muted); }
+
+.ax-btn-ghost {
+  background: transparent;
+  color: var(--muted-foreground);
+}
+.ax-btn-ghost:hover { background: var(--muted); color: var(--foreground); }
+
+.ax-btn-destructive,
+.confirm-btn-danger {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  font-weight: var(--weight-semibold);
+}
+.ax-btn-destructive:hover,
+.confirm-btn-danger:hover { background: color-mix(in srgb, var(--destructive) 88%, black); }
+
+.ax-btn-subtle {
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+.ax-btn-subtle:hover { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+
+/* Sizes (.confirm-btn maps to the sm anatomy to stay near its prior size) */
+.ax-btn-sm,
+.confirm-btn { height: 30px; padding: 0 var(--space-3); font-size: var(--text-sm); border-radius: var(--radius-sm); }
+.ax-btn-lg { height: 42px; padding: 0 var(--space-5); font-size: var(--text-lg); }
+.ax-btn-icon { width: 36px; height: 36px; padding: 0; }
+.ax-btn-icon.ax-btn-sm { width: 30px; height: 30px; }
+.ax-btn-block { width: 100%; }
+
+/* ── Inputs ───────────────────────────────────────────────── */
+.ax-input,
+.ax-textarea,
+.ax-select {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-base); /* >=16px on mobile handled below */
+  line-height: var(--leading-normal);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+.ax-textarea { min-height: 72px; resize: vertical; }
+.ax-input::placeholder,
+.ax-textarea::placeholder { color: var(--muted-foreground); }
+.ax-input:focus,
+.ax-textarea:focus,
+.ax-select:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 28%, transparent);
+}
+.ax-input:disabled,
+.ax-textarea:disabled,
+.ax-select:disabled { opacity: 0.55; cursor: not-allowed; }
+.ax-input[aria-invalid="true"],
+.ax-textarea[aria-invalid="true"] { border-color: var(--destructive); }
+
+/* Field grouping (label + control + hint/error) */
+.ax-field { display: flex; flex-direction: column; gap: var(--space-2); }
+.ax-label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--foreground); }
+.ax-hint { font-size: var(--text-xs); color: var(--muted-foreground); }
+.ax-error { font-size: var(--text-xs); color: var(--destructive); }
+
+/* iOS zoom guard: keep tappable inputs >=16px on small screens */
+@media (max-width: 768px) {
+  .ax-input, .ax-textarea, .ax-select { font-size: 16px; }
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.ax-card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.ax-card-header { padding: var(--space-5) var(--space-5) 0; }
+.ax-card-title { margin: 0; font-size: var(--text-lg); font-weight: var(--weight-semibold); color: var(--foreground); }
+.ax-card-desc { margin: var(--space-1) 0 0; font-size: var(--text-sm); color: var(--muted-foreground); }
+.ax-card-body { padding: var(--space-5); }
+.ax-card-footer { padding: 0 var(--space-5) var(--space-5); display: flex; gap: var(--space-3); justify-content: flex-end; }
+
+/* ── Badge ────────────────────────────────────────────────── */
+.ax-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  line-height: 1.4;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.ax-badge-primary { background: var(--primary-subtle); color: var(--primary); }
+.ax-badge-success { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+.ax-badge-warning { background: color-mix(in srgb, var(--warning) 20%, transparent); color: var(--warning); }
+.ax-badge-destructive { background: color-mix(in srgb, var(--destructive) 18%, transparent); color: var(--destructive); }
+.ax-badge-outline { background: transparent; border-color: var(--border-strong); color: var(--foreground); }
+
+/* ── Keyboard key ─────────────────────────────────────────── */
+.ax-kbd {
+  display: inline-flex;
+  align-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ── Switch (toggle) ──────────────────────────────────────── */
+.ax-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 38px;
+  height: 22px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--input);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-out);
+}
+.ax-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.ax-switch[aria-checked="true"] { background: var(--primary); }
+.ax-switch[aria-checked="true"]::after { transform: translateX(16px); }
+.ax-switch:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring); }
+
+/* ── Skeleton (loading) ───────────────────────────────────── */
+.ax-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+}
+.ax-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent,
+    color-mix(in srgb, var(--foreground) 7%, transparent), transparent);
+  animation: ax-shimmer 1.4s ease-in-out infinite;
+}
+.ax-skeleton-text { height: 12px; margin-bottom: var(--space-2); }
+.ax-skeleton-title { height: 18px; width: 40%; margin-bottom: var(--space-3); }
+.ax-skeleton-circle { border-radius: 50%; }
+@keyframes ax-shimmer { 100% { transform: translateX(100%); } }
+
+/* ── Empty state ──────────────────────────────────────────── */
+.ax-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-12) var(--space-6);
+  color: var(--muted-foreground);
+}
+.ax-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px; height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.ax-empty-icon svg { width: 24px; height: 24px; }
+.ax-empty-title { font-size: var(--text-lg); font-weight: var(--weight-semibold); color: var(--foreground); }
+.ax-empty-desc { font-size: var(--text-sm); max-width: 38ch; line-height: var(--leading-normal); }
+.ax-empty-actions { margin-top: var(--space-2); display: flex; gap: var(--space-3); }
+
+/* ── Divider ──────────────────────────────────────────────── */
+.ax-divider { height: 1px; border: 0; background: var(--border-subtle); margin: var(--space-4) 0; }
+
+/* ── Tooltip (CSS-only, opt-in via data-ax-tip) ───────────── */
+[data-ax-tip] { position: relative; }
+[data-ax-tip]::after {
+  content: attr(data-ax-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--popover);
+  color: var(--foreground);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  z-index: 9999;
+}
+[data-ax-tip]:hover::after,
+[data-ax-tip]:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Conservative shared-shell refinements ───────────────────
+   These touch the EXISTING modal shell so every dialog in the app
+   inherits cohesive radius / elevation / spacing immediately. Kept low
+   specificity so per-feature overrides still win. */
+.modal-content {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.modal-header {
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* Header controls (close / minimize) — soften the legacy "solid --fg box that
+   inverts on hover" into a modern ghost icon button. Scoped to .modal-header
+   so the bespoke confirm/prompt boxes keep their own treatment. Size, glyphs,
+   and JS are untouched — color/border/hover only. */
+.modal-header .close-btn,
+.modal-header .modal-close,
+.modal-header .minimize-btn,
+.modal-header .modal-minimize-btn {
+  background: transparent;
+  color: var(--muted-foreground);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+.modal-header .close-btn:hover,
+.modal-header .modal-close:hover,
+.modal-header .minimize-btn:hover,
+.modal-header .modal-minimize-btn:hover {
+  background: var(--elevated);
+  color: var(--foreground);
+}
+.modal-header .close-btn:hover {
+  /* destructive affordance on the dismiss action specifically */
+  background: color-mix(in srgb, var(--destructive) 16%, transparent);
+  color: var(--destructive);
+}
+
+/* ── Chat composer adoption ──────────────────────────────────
+   The composer already inherits the token palette and the global focus
+   ring. These additive rules give it a single, premium focus affordance
+   (the whole bar lights up, like Claude/ChatGPT) instead of a bare inner
+   outline, and prevent iOS zoom-on-focus from the 13px input. No markup
+   or JS changes, so the send-button morph + mode-toggle animations are
+   untouched. */
+.chat-input-bar {
+  transition: border-color var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+.chat-input-bar:focus-within {
+  border-color: color-mix(in srgb, var(--ring) 55%, var(--border-subtle));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 15%, transparent);
+}
+/* Single cohesive focus indicator on the bar — suppress the inner
+   textarea's own outline so the two don't stack. */
+#message:focus,
+#message:focus-visible { outline: none; }
+/* Keep the composer input >=16px on phones to stop the focus-zoom jump. */
+@media (max-width: 768px) {
+  #message { font-size: 16px !important; }
+}
+
+/* ── Empty & loading state harmonization ─────────────────────
+   Unifies the bespoke per-feature empty/loading classes onto the muted
+   token treatment so they read consistently with .ax-empty, without
+   rewriting each module. Modules can migrate to the full .ax-empty
+   structure (icon + title + desc + action) incrementally. */
+.memory-empty, .gallery-empty, .gallery-albums-empty, .notes-empty,
+.email-empty, .doclib-empty, .cal-empty-state, .lib-loading-row {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ax-skeleton::after { animation: none; }
+  .ax-btn, .ax-switch, .ax-switch::after,
+  .ax-input, .ax-textarea, .ax-select, .chat-input-bar { transition: none; }
+}

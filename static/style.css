@@ -16,18 +16,96 @@
  */
 
 :root {
-  /* Core palette */
-  --bg: #282c34;
-  --fg: #9cdef2;
-  --panel: #111;
-  --border: #355a66;
-  --red: #e06c75;
-  /* Were `var(--green)` / `var(--warn)` — self-referential, so they
-     resolved to invalid and every site fell back to its own literal
-     (or, for sites with no fallback, painted as transparent/inherit).
-     Anchor them to real hex so the token layer actually works. */
-  --green: #50fa7b;
-  --warn: #f0ad4e;
+  /* ── Public theme API (the source of truth the theme system writes to) ──
+     theme.js and the index.html bootstrap set these five at runtime from a
+     saved theme. The premium Ariadne defaults below apply when no custom
+     theme is active. Everything else in this file derives from these, so a
+     single theme change re-skins the whole app — old CSS and the new
+     shadcn-style component layer alike. */
+  --bg: #111114;            /* near-black neutral base */
+  --fg: #e7e7ec;            /* high-contrast foreground (AA on --bg) */
+  --panel: #17171c;         /* card / sidebar surface, lifted off --bg */
+  --border: #26262e;        /* hairline borders */
+  --red: #4f46e5;           /* brand accent (indigo-600 — AA with #fff text; name kept for back-compat) */
+  --green: #22c55e;
+  --warn: #f59e0b;
+
+  /* ── Derived semantic surfaces (shadcn variable contract) ──
+     Built with color-mix so they track whatever theme is active instead of
+     being hardcoded. New components consume these names. */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--panel);
+  --card-foreground: var(--fg);
+  --popover: var(--panel);
+  --popover-foreground: var(--fg);
+  --muted: color-mix(in srgb, var(--panel) 72%, var(--bg));
+  /* Muted text mixes toward --fg. Was 58%, which left empty-state / helper
+     copy (e.g. "Add an AI endpoint…", "No events", the "Nobody" pill) borderline
+     on WCAG AA in both themes. Bumped to 70% so muted text clears AA while still
+     reading clearly quieter than full-strength --fg. */
+  --muted-foreground: color-mix(in srgb, var(--fg) 70%, var(--bg));
+  /* Legacy alias: ~98 call sites use var(--fg-muted) but it was never
+     defined, so that intended-muted text was rendering at full strength.
+     Alias it to the semantic token so muted text is actually muted, app-wide
+     and per-theme. */
+  --fg-muted: var(--muted-foreground);
+  --elevated: color-mix(in srgb, var(--fg) 7%, var(--panel)); /* hover surface */
+  /* Theme-aware hover overlay. Was undefined, so call sites fell back to a
+     hardcoded white rgba — invisible on light themes. */
+  --hover-bg: color-mix(in srgb, var(--fg) 6%, transparent);
+  --border-subtle: var(--border);
+  --border-strong: color-mix(in srgb, var(--border) 60%, var(--fg));
+  --input: var(--border);
+  --primary: var(--red);
+  --primary-foreground: #ffffff;
+  --primary-hover: color-mix(in srgb, var(--red) 86%, white);
+  --primary-subtle: color-mix(in srgb, var(--red) 14%, transparent);
+  --ring: var(--red);
+  --accent: var(--red);     /* legacy alias some components already expect */
+
+  /* ── Status (semantic, not theme-driven) ── */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: var(--green);
+  --warning: var(--warn);
+
+  /* ── Radius scale ── */
+  --radius: 0.625rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-pill: 9999px;
+
+  /* ── Spacing scale (4px base) ── */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --space-12: 48px; --space-16: 64px;
+
+  /* ── Elevation ── */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.40);
+  --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.50);
+
+  /* ── Typography ──
+     UI is a proportional sans (Inter, self-hosted); mono is reserved for
+     code/terminal surfaces. --font-family is the legacy hook theme.js sets
+     for the font picker; it now defaults to the sans stack. */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-family: var(--font-sans);
+  --text-xs: 12px;  --text-sm: 13px; --text-base: 14px;
+  --text-lg: 16px;  --text-xl: 18px; --text-2xl: 22px;
+  --leading-tight: 1.3; --leading-normal: 1.55;
+  --weight-normal: 400; --weight-medium: 500; --weight-semibold: 600;
+
+  /* ── Motion ── */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 120ms; --dur-base: 160ms; --dur-slow: 240ms;
+
+  /* ── Breakpoint reference (CSS @media can't read vars; documented here) ──
+     --bp-sm: 640px · --bp-md: 768px · --bp-lg: 1024px · --bp-xl: 1280px */
 
   /* Syntax highlighting */
   --hl-bg: #1e2228;
@@ -41,17 +119,22 @@
   --hl-variable: #abb2bf;
   --hl-params: #a8c0d4;
 
-  /* Semantic colors */
-  --color-error: #ff4444;
-  --color-error-light: #ff6666;
-  --color-success: #4caf50;
-  --color-warning: #f0ad4e;
-  --color-danger: #c0392b;
+  /* Semantic colors — now mapped onto the token scale for app-wide
+     consistency (were ad-hoc one-off hexes). */
+  --color-error: var(--destructive);
+  --color-error-light: color-mix(in srgb, var(--destructive) 75%, white);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--destructive);
   --color-recording: #ff3b30;
   --color-recording-hover: #d63031;
-  --color-muted: #888;
-  --color-muted-alt: #6b7280;
-  --color-accent: #00aaff;
+  --color-muted: var(--muted-foreground);
+  --color-muted-alt: var(--muted-foreground);
+  --color-accent: var(--primary);
+  /* Legacy alias: a few call sites use var(--accent-primary) (some without a
+     fallback, e.g. the "new session" option), which was undefined and lost
+     its accent. Alias it to the brand accent. */
+  --accent-primary: var(--accent);
   --color-agent-active: #00ff00;
   --color-brand-blue: #3b82f6;
   --color-blind-orange: #ff9800;
@@ -68,27 +151,15 @@
   --accent-warm: #d19a66;
 }
 
-:root.light {
-  --bg: #f5f5f5;
-  --fg: #2b2b2b;
-  --panel: #fff;
-  --border: #bbb;
-  --hl-bg: #f9f9f9;
-  --hl-fg: #2b2b2b;
-  --hl-keyword: #7928a1;
-  --hl-string: #986801;
-  --hl-comment: #6a737d;
-  --hl-function: #005cc5;
-  --hl-number: #986801;
-  --hl-builtin: #0070a0;
-  --hl-variable: #383a42;
-  --hl-params: #4a4f5c;
-  --select-bg: #eaeaea;
-  --select-fg: var(--fg);
-  --select-option-bg: var(--panel);
-  --select-option-fg: var(--fg);
-  --select-option-active-bg: color-mix(in srgb, var(--red) 16%, var(--panel));
-}
+/* NOTE: There is intentionally no `:root.light` palette here.
+   The theme system (theme.js) never adds a `.light` class — it writes the five
+   public theme vars (--bg/--fg/--panel/--border/--red) as INLINE styles on
+   :root, and inline styles (1,0,0,0) always outrank a `:root.light` selector
+   (0,0,2,0). So a hardcoded `:root.light { … }` block could never take effect
+   and only caused confusion. The premium light experience now ships as a real,
+   selectable preset — `daylight` in theme.js (same #fbfbfc / #1b1b1f / #ffffff
+   / #e5e5ea / indigo palette) — which feeds these same color-mix tokens through
+   the live, inline-var path. Add new light variants there, not here. */
 
 /* ── Reset & Base ── */
 
@@ -348,7 +419,7 @@ body.bg-pattern-sparkles {
     }
     /* Offline badge next to endpoint name */
     .endpoint-offline-badge {
-      color: var(--danger, #f44);
+      color: var(--destructive);
       font-size: 0.8em;
       margin-left: 4px;
       opacity: 0.7;
@@ -601,6 +672,7 @@ body.bg-pattern-sparkles {
       font-size: 1rem;
       font-weight: 600;
       line-height: 1.35;
+      letter-spacing: -0.01em;
       color: var(--brand-color, var(--red));
       white-space: nowrap;
       user-select: none;
@@ -665,6 +737,13 @@ body.bg-pattern-sparkles {
     body.hamburger-right .hamburger-btn {
       left: auto;
       right: 9px;
+    }
+    /* Extend the tap target to ~46px (WCAG 2.5.5) without moving or resizing
+       the 30px icon — avoids disturbing the tuned alignment with the logo. */
+    .hamburger-btn::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
     }
     .mobile-new-chat-btn {
       display: none;
@@ -738,7 +817,11 @@ body.bg-pattern-sparkles {
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.5;
+      /* Resting icons were 0.5, which on light themes (accent over a near-white
+         rail) fell below the 3:1 non-text contrast floor and read as faint.
+         0.7 clears AA for icons in light while staying clearly dimmer than the
+         active/hover state (opacity 1 + accent background tint). */
+      opacity: 0.7;
       transition: opacity 0.08s, background 0.08s;
     }
     .rail-notes-badge {
@@ -750,7 +833,7 @@ body.bg-pattern-sparkles {
       padding: 0 3px;
       border-radius: 7px;
       background: color-mix(in srgb, var(--accent) 85%, var(--bg));
-      color: var(--bg);
+      color: #fff;
       font-size: 9px;
       font-weight: 700;
       line-height: 14px;
@@ -1443,7 +1526,7 @@ body.bg-pattern-sparkles {
       justify-content: center;
     }
     .session-bulk-btn:hover { opacity: 1; }
-    .session-bulk-btn-danger { color: var(--red); opacity: 0.5; }
+    .session-bulk-btn-danger { color: var(--destructive); opacity: 0.5; }
     .session-bulk-btn-danger:hover { opacity: 1; }
     /* Checkbox in select mode */
     .session-select-cb {
@@ -1802,13 +1885,11 @@ body.bg-pattern-sparkles {
       border-color: var(--fg);
       background-color: var(--panel);
     }
-    :root.light input,
-    :root.light textarea,
-    :root.light button,
-    :root.light select {
-      background:#eaeaea;
-      color-scheme: light;
-    }
+    /* (Removed dead `:root.light input/textarea/select/button` rules: the
+       `.light` class is never applied — light themes come through inline theme
+       vars — so these never ran. Native light form fields already get their
+       fill/contrast from the theme-derived tokens on the rules above. See the
+       note near the top of this file and the `daylight` preset in theme.js.) */
     input[type="text"] { height:32px; width:100%; }
     textarea { width:100%; min-height:32px; height:auto; max-height:30lh; overflow-y:auto; resize:none; }
     button { height:32px; padding:0 10px; }
@@ -1828,7 +1909,6 @@ body.bg-pattern-sparkles {
       background-color: var(--select-option-active-bg);
       color: var(--select-option-fg);
     }
-    :root.light select { color-scheme: light; }
     .chat-container {
       flex:1;
       display:flex;
@@ -1926,7 +2006,7 @@ body.bg-pattern-sparkles {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing:0.03em;
+      letter-spacing:-0.01em;
       margin-bottom:10px;
     }
     .welcome-boat {
@@ -1938,8 +2018,11 @@ body.bg-pattern-sparkles {
     }
     #welcome-screen .welcome-sub {
       font-size:0.85rem;
-      color:color-mix(in srgb, var(--fg) 60%, transparent);
-      opacity:0.6;
+      /* Was fg@60%-transparent AND opacity:0.6 (≈0.36 effective alpha) — too
+         faint for AA. Use the shared muted token at full alpha so the subtitle
+         reads clearly while staying secondary to the heading. */
+      color:var(--fg-muted);
+      opacity:1;
       line-height:1.5;
       max-width:300px;
     }
@@ -1952,8 +2035,11 @@ body.bg-pattern-sparkles {
     }
     #welcome-screen .welcome-tip {
       font-size:0.75rem;
-      color:var(--fg);
-      opacity:0.2;
+      /* First-run guidance ("Add an AI endpoint…") was fg@0.2 — effectively
+         invisible and well below AA, despite being the key onboarding hint when
+         no model is configured. Route to the muted token so it's legible. */
+      color:var(--fg-muted);
+      opacity:0.9;
       margin-top:24px;
       max-width:320px;
       line-height:1.4;
@@ -1964,7 +2050,10 @@ body.bg-pattern-sparkles {
       background: none;
       border: 1px solid var(--border);
       color: var(--fg);
-      opacity: 0.25;
+      /* "Nobody" pill was 0.25 — borderline invisible. 0.65 keeps it a quiet,
+         secondary affordance while clearing the contrast floor for its label
+         and border. (Hover/active states still ramp to full strength below.) */
+      opacity: 0.65;
       cursor: pointer;
       padding: 6px 12px;
       border-radius: 20px;
@@ -1978,7 +2067,7 @@ body.bg-pattern-sparkles {
       font-size: 11px;
     }
     .incognito-btn:hover {
-      opacity: 0.6;
+      opacity: 0.9;
       background: color-mix(in srgb, var(--fg) 6%, transparent);
     }
     .incognito-btn.active {
@@ -3509,7 +3598,7 @@ body.bg-pattern-sparkles {
     .footer-copy-btn:hover { color:var(--accent); }
     /* Delete action — same chrome as copy/download/edit but hover reveals
        the destructive red tint so the user can tell it's not a benign op. */
-    .footer-delete-btn:hover { color: var(--red); }
+    .footer-delete-btn:hover { color: var(--destructive); }
     .regen-btn {
       background:none; border:none;
       color:var(--color-muted-alt); font-size:1.1rem; cursor:pointer;
@@ -3536,10 +3625,23 @@ body.bg-pattern-sparkles {
     .msg-action-btn:hover { color:var(--accent); }
     .msg-action-btn[data-action="shorten"] { position:relative; top:1px; font-size:1.25rem; }
     .msg-delete-btn { position:relative; top:1px; }
-    .msg-delete-btn:hover { color:var(--red); }
+    .msg-delete-btn:hover { color:var(--destructive); }
     .msg-more-btn {
       font-size:0.7rem; letter-spacing:0.5px;
     }
+    /* Keyboard focus affordance for the always-visible message action buttons.
+       They previously only reacted to hover, leaving no indicator on Tab focus. */
+    .footer-copy-btn:focus-visible,
+    .footer-delete-btn:focus-visible,
+    .regen-btn:focus-visible,
+    .fork-btn:focus-visible,
+    .msg-action-btn:focus-visible,
+    .msg-more-btn:focus-visible {
+      outline: none;
+      color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 40%, transparent);
+    }
+    .footer-delete-btn:focus-visible { color: var(--destructive); }
     .msg-overflow-menu {
       position:fixed;
       background:var(--panel);
@@ -3733,7 +3835,7 @@ body.bg-pattern-sparkles {
       font-size:0.9em;
       font-weight:600;
       opacity:1;
-      color:var(--bg);
+      color:#fff;
       background:var(--accent, var(--red));
       border-radius:999px;
       padding:4px 14px;
@@ -3800,6 +3902,13 @@ body.bg-pattern-sparkles {
     pre .copy-code.bottom { top:auto; bottom:6px; }
     pre:hover .copy-code { opacity:0.7; }
     pre .copy-code:hover { opacity:1; }
+    /* Reveal + ring the copy button on keyboard focus (it's opacity:0 until
+       hover, so Tab users had no way to see it). */
+    pre .copy-code:focus-visible {
+      opacity:1; outline:none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 40%, transparent);
+    }
     pre .copy-code.copied {
       opacity: 1;
       color: var(--color-save-green, #4caf50);
@@ -5357,35 +5466,14 @@ body.bg-pattern-sparkles {
       .styled-confirm-box .modal-header h4 { font-size: 0.9rem; }
       .styled-confirm-box .modal-body p { font-size: 0.85rem; margin: 6px 0 10px; }
       .styled-confirm-box .modal-footer { gap: 10px; }
-      .styled-confirm-box .confirm-btn {
-        flex: 1;
-        /* More bottom than top padding nudges the label up ~2px so it isn't
-           sitting low in the taller mobile buttons. */
-        padding: 8px 12px 12px;
-        font-size: 0.85rem;
-        border-radius: 8px;
-        text-align: center;
-      }
+      /* Mobile layout deltas only — buttons go full-width with a comfortable
+         touch height. Anatomy/colour/focus come from the ax-btn ruleset
+         (components.css), which .confirm-btn is converged onto. */
+      .styled-confirm-box .confirm-btn { flex: 1; min-height: 40px; }
     }
-    .confirm-btn {
-      /* Asymmetric padding nudges the label UP ~2px from where it was (more
-         bottom than top padding), so the confirm-dialog text isn't sitting low. */
-      padding:3px 16px 5px; border-radius:4px; font-size:0.85rem;
-      cursor:pointer; border:1px solid var(--border);
-      font-family:inherit;
-    }
-    @media (max-width: 820px) {
-      /* Mobile: flip the asymmetry to shift the text 1 px UP from
-         centre instead (the bigger touch targets on mobile read better
-         with the label sitting slightly high). */
-      .confirm-btn { padding:2px 16px 4px; }
-    }
-    .confirm-btn-secondary { background:var(--bg); color:var(--fg); }
-    .confirm-btn-secondary:hover { background:var(--border); }
-    .confirm-btn-primary { background:var(--accent-primary, var(--red, #4a9eff)); color:#fff; border-color:transparent; }
-    .confirm-btn-primary:hover { filter:brightness(1.15); }
-    .confirm-btn-danger { background:var(--color-danger); color:#fff; border-color:transparent; }
-    .confirm-btn-danger:hover { background:var(--color-error); }
+    /* NOTE: the .confirm-btn base + variant + focus-visible styles now live in
+       static/css/components.css, where the dialog-button family is converged
+       onto the .ax-btn (sm) ruleset. */
     #cookbook-gguf-delete-overlay {
       background:rgba(0,0,0,0.5);
       backdrop-filter:blur(4px);
@@ -5771,6 +5859,7 @@ body.bg-pattern-sparkles {
     #custom-preset-modal .modal-body input[type="text"]:focus {
       outline: none;
       border-color: var(--red);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
     }
 
     #custom-preset-modal .modal-footer {
@@ -5803,7 +5892,7 @@ body.bg-pattern-sparkles {
          var(--accent, var(--red)). The old bare var(--accent) resolved to nothing
          which, with color:var(--bg), made the button invisible. */
       background: var(--accent, var(--red));
-      color: var(--bg);
+      color: #fff;
       border-color: var(--accent, var(--red));
     }
     #custom-preset-modal .modal-footer button#save-custom-preset:hover {
@@ -5991,8 +6080,12 @@ body.bg-pattern-sparkles {
       opacity: 0;
       transform: translateY(-4px);
       transition: opacity 0.28s ease-out, transform 0.28s ease-out;
-      pointer-events: auto;
+      /* First-run hint: let clicks fall THROUGH the bubble to the panel controls
+         underneath, so even if it visually overlaps a toolbar on open it never
+         blocks interaction. Only the dismiss button re-enables pointer events. */
+      pointer-events: none;
     }
+    .tour-hint-dismiss { pointer-events: auto; }
     .tour-hint.tour-hint-in  { opacity: 1; transform: translateY(0); }
     .tour-hint.tour-hint-out { opacity: 0; transform: translateY(-4px); }
     .tour-hint-visual {
@@ -6053,7 +6146,7 @@ body.bg-pattern-sparkles {
       top: -22px;
       left: 8px;
       background: var(--red);
-      color: var(--bg);
+      color: #fff;
       font-size: 0.7rem;
       padding: 2px 8px;
       border-radius: 4px;
@@ -6088,7 +6181,7 @@ body.bg-pattern-sparkles {
     .setup-wizard .setup-label { font-size: 0.85rem; color: var(--fg); opacity: 0.7; margin-bottom: 8px; }
     .setup-wizard .setup-presets { display: flex; flex-wrap: wrap; gap: 8px; }
     .setup-wizard .setup-preset-btn {
-      padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
       background: var(--panel); color: var(--fg); cursor: pointer;
       font-size: 0.85rem; transition: all 0.2s;
     }
@@ -6096,12 +6189,18 @@ body.bg-pattern-sparkles {
     .setup-wizard .setup-input {
       display: block; width: 100%; padding: 8px 12px; margin-bottom: 8px;
       background: var(--panel); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--fg); font-size: 0.85rem; box-sizing: border-box;
+      border-radius: 8px; color: var(--fg); font-size: 0.85rem; box-sizing: border-box;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
-    .setup-wizard .setup-input:focus { border-color: var(--red); outline: none; }
+    .setup-wizard .setup-input:focus {
+      border-color: var(--red); outline: none;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
+    }
     .setup-wizard .setup-connect-btn {
-      padding: 8px 20px; background: var(--red); color: var(--bg);
-      border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 4px;
+      /* #fff (not var(--bg)) so the label clears contrast on the indigo
+         accent — var(--bg) is near-black under the premium palette. */
+      padding: 8px 20px; background: var(--red); color: #fff;
+      border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 4px;
     }
     .setup-wizard .setup-connect-btn:hover { opacity: 0.9; }
     .setup-wizard .setup-status { font-size: 0.8rem; margin-top: 8px; color: var(--fg); opacity: 0.7; }
@@ -6181,10 +6280,13 @@ body.bg-pattern-sparkles {
       line-height: 1.3;
     }
 
-    .dropdown-item:hover {
+    .dropdown-item:hover,
+    .dropdown-item:focus-visible {
       background: color-mix(in srgb, var(--red) 10%, transparent);
+      outline: none;
     }
-    .dropdown-item:hover .menu-icon {
+    .dropdown-item:hover .menu-icon,
+    .dropdown-item:focus-visible .menu-icon {
       background: color-mix(in srgb, var(--red) 15%, transparent);
     }
 
@@ -6200,8 +6302,10 @@ body.bg-pattern-sparkles {
       color: var(--fg);
       transition: background 0.1s;
     }
-    .dropdown-item-compact:hover {
+    .dropdown-item-compact:hover,
+    .dropdown-item-compact:focus-visible {
       background: color-mix(in srgb, var(--accent) 10%, transparent);
+      outline: none;
     }
     .dropdown-item-compact .dropdown-icon {
       width: 14px;
@@ -6228,7 +6332,11 @@ body.bg-pattern-sparkles {
       .session-dropdown .dropdown-shortcut { display: none; }
     }
     .dropdown-item-danger {
-      color: var(--red) !important;
+      color: var(--destructive) !important;
+    }
+    .dropdown-item-danger:hover,
+    .dropdown-item-danger:focus-visible {
+      background: color-mix(in srgb, var(--destructive) 12%, transparent);
     }
     .dropdown-item-danger .dropdown-icon {
       opacity: 0.7;
@@ -10212,6 +10320,7 @@ details a:hover {
 .char-template-select:focus {
   outline: none;
   border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
 }
 .char-action-btn {
   background: none;
@@ -10573,6 +10682,14 @@ textarea.memory-add-input {
 .memory-toolbar-btn:hover {
   border-color: var(--fg);
   color: var(--fg);
+}
+/* Shared across Memory, Email reader, Document Library + Archive toolbars —
+   had no keyboard focus indicator. One ring covers them all. */
+.memory-toolbar-btn:focus-visible {
+  outline: none;
+  border-color: var(--accent, var(--red));
+  color: var(--fg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--red)) 18%, transparent);
 }
 
 .memory-toolbar-btn.active {
@@ -10940,6 +11057,7 @@ textarea.memory-add-input {
 .memory-search-input:focus {
   outline: none;
   border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
 }
 
 .memory-list {
@@ -11514,6 +11632,7 @@ textarea.memory-add-input {
 .email-filter-btn:focus-visible {
   outline: none;
   border-color: var(--accent, var(--red));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--red)) 18%, transparent);
 }
 .email-filter-current {
   flex: 1;
@@ -12405,7 +12524,10 @@ textarea.memory-add-input {
 
 .doc-language-select {
   background-color: var(--bg);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239cdef2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>");
+  /* Neutral-grey chevron reads acceptably on both dark and light surfaces.
+     (Was hardcoded cyan #9cdef2 — invisible on light themes — with a dead
+     `:root.light` override that never ran since `.light` is never applied.) */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>");
   background-repeat: no-repeat;
   background-position: right 4px center;
   color: var(--fg);
@@ -12426,10 +12548,6 @@ textarea.memory-add-input {
   cursor: pointer;
   -moz-appearance: none;
   appearance: none;
-}
-/* Light theme: tint the chevron with the light foreground instead of cyan. */
-:root.light .doc-language-select {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232b2b2b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>");
 }
 /* New-tab "+" spins on hover, like the library sidebar "+". */
 .doc-tab-new svg { transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -12863,7 +12981,7 @@ textarea.memory-add-input {
   color: var(--fg);
   outline: none;
 }
-.doc-find-input:focus { border-color: var(--accent); }
+.doc-find-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--red)) 18%, transparent); }
 .doc-find-count {
   font-size: 11px;
   opacity: 0.6;
@@ -12984,14 +13102,14 @@ textarea.memory-add-input {
    forced solid colors + !important so it ALWAYS pops. */
 mark.doc-find-mark {
   background: var(--accent) !important;
-  color: var(--bg) !important;
+  color: #fff !important;
   border-radius: 2px;
   padding: 0 1px;
   box-shadow: 0 0 0 1px var(--accent);
 }
 mark.doc-find-mark.current {
   background: var(--accent) !important;
-  color: var(--bg) !important;
+  color: #fff !important;
   box-shadow: 0 0 0 2px var(--fg);
   outline: 1px solid var(--fg);
 }
@@ -14685,7 +14803,7 @@ span[id$="-logo"] svg:not([width]) {
   font-size: 14px; line-height: 1; padding: 0 2px;
   transition: opacity 0.15s, color 0.15s;
 }
-.search-fb-remove:hover { opacity: 1; color: var(--red); }
+.search-fb-remove:hover { opacity: 1; color: var(--destructive); }
 .search-fb-add {
   background: var(--bg); color: var(--fg);
   border: 1px dashed var(--border); border-radius: 10px;
@@ -18054,7 +18172,7 @@ body.gallery-selecting .gallery-dl-btn,
   border: 1px solid var(--red); border-radius: 4px; cursor: pointer;
   font-size: 11px; font-family: inherit;
 }
-.gallery-bulk-delete:hover { background: var(--red); color: #fff; }
+.gallery-bulk-delete:hover { background: var(--destructive); color: #fff; }
 .gallery-bulk-cancel {
   padding: 3px 10px; background: transparent; color: var(--fg);
   border: 1px solid var(--border); border-radius: 4px; cursor: pointer;
@@ -18098,10 +18216,9 @@ body.gallery-selecting .gallery-dl-btn,
 }
 .gallery-empty {
   text-align: center;
-  color: color-mix(in srgb, var(--fg) 35%, transparent);
+  color: var(--fg-muted);
   padding: 32px 16px;
   font-size: 12px;
-  font-style: italic;
 }
 .gallery-load-more {
   display: block;
@@ -18794,7 +18911,10 @@ body.gallery-selecting .gallery-dl-btn,
   border-radius: 6px;
   outline: none;
 }
-.cookbook-field-input:focus { border-color: var(--red); }
+.cookbook-field-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
+}
 #hwfit-dl-server, #hwfit-usecase, #hwfit-server-select, #hwfit-cache-server, #serve-sort { height: 28px; width: 88px; }
 /* Serve tab — match Documents sizing, but leave room for the active "Cancel"
    label and center it vertically so the descenders don't clip. */
@@ -18843,7 +18963,7 @@ body.gallery-selecting .gallery-dl-btn,
 .cookbook-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .cookbook-run-btn {
   background: var(--accent);
-  color: var(--panel);
+  color: #fff;
   border-color: var(--accent);
   font-weight: 600;
 }
@@ -21322,7 +21442,7 @@ body.gallery-selecting .gallery-dl-btn,
 }
 .cookbook-gpu-btn.active {
   background: var(--red);
-  color: var(--panel);
+  color: #fff;
   border-color: var(--red);
 }
 
@@ -21348,7 +21468,7 @@ body.gallery-selecting .gallery-dl-btn,
   padding: 0 4px;
   line-height: 1;
 }
-.cookbook-remove-instance-btn:hover { color: var(--red); }
+.cookbook-remove-instance-btn:hover { color: var(--destructive); }
 
 /* Preset chips */
 /* Saved card styling */
@@ -22665,15 +22785,18 @@ body.gallery-selecting .gallery-dl-btn,
 }
 .shortcut-key-unset:hover .shortcut-unset { border-color: var(--accent, var(--red)); color: var(--fg); }
 .shortcut-key kbd {
-  display: inline-block; font-family: inherit; font-size: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  /* Monospace keycaps with a 2px bottom border — the conventional keycap
+     anatomy, matched to the .ge-shortcuts reference overlay and .ax-kbd. */
+  font-family: var(--font-mono); font-size: 10px;
   padding: 2px 6px; min-width: 20px; text-align: center;
   /* Highlight kbd chips in the theme accent so they stand out from
      normal text and clearly mark "this is a key you press". */
   background: color-mix(in srgb, var(--accent, var(--red)) 14%, var(--bg));
   border: 1px solid color-mix(in srgb, var(--accent, var(--red)) 40%, var(--border));
+  border-bottom-width: 2px;
   color: var(--accent, var(--red));
-  border-radius: 3px;
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--accent, var(--red)) 25%, transparent);
+  border-radius: 4px;
   line-height: 1.4;
   font-weight: 600;
 }
@@ -23544,8 +23667,8 @@ a.chat-link[href^="#research-"] {
 }
 .task-btn-primary:hover { opacity: 0.85; }
 
-.task-btn-danger { color: var(--red); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
-.task-btn-danger:hover { opacity: 1; border-color: var(--red); }
+.task-btn-danger { color: var(--destructive); border-color: color-mix(in srgb, var(--destructive) 30%, transparent); }
+.task-btn-danger:hover { opacity: 1; border-color: var(--destructive); }
 
 .tasks-clock {
   font-size: 10px;
@@ -23704,6 +23827,7 @@ input.settings-select::placeholder { color: color-mix(in srgb, var(--fg) 35%, tr
 .settings-select:focus {
   outline: none;
   border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
 }
 
 /* Default-chat fallback chain editor. Each row mirrors the primary
@@ -24191,7 +24315,7 @@ details.hwfit-serve-advanced > .hwfit-serve-checks:last-of-type {
 /* Quick run button */
 .cookbook-run-btn {
   background: var(--accent, var(--red)) !important;
-  color: var(--panel) !important;
+  color: #fff !important;
   border-color: var(--accent, var(--red)) !important;
   font-weight: 600;
 }
@@ -25132,7 +25256,7 @@ details.hwfit-serve-advanced > .hwfit-serve-checks:last-of-type {
   transition: opacity 0.12s, background 0.12s;
 }
 .gallery-editor-draft-card:hover .gallery-editor-draft-delete { opacity: 1; }
-.gallery-editor-draft-delete:hover { background: var(--red); }
+.gallery-editor-draft-delete:hover { background: var(--destructive); }
 /* Editor layout */
 .gallery-editor {
   display: flex;
@@ -27109,6 +27233,23 @@ details.hwfit-serve-advanced > .hwfit-serve-checks:last-of-type {
   color: var(--accent, var(--red));
 }
 .ge-btn-sm { padding: 3px 6px; font-size: 10px; }
+/* Keyboard focus affordance for the image-editor controls — buttons had no
+   :focus-visible at all (mouse-only) and inputs were border-only. Adds the
+   app's standard ring so the dense editor is keyboard-navigable. Shown only
+   on keyboard focus, so it doesn't clutter pointer use. */
+.ge-btn:focus-visible,
+.ge-tool-btn:focus-visible,
+.ge-layer-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring);
+}
+.ge-transform-popup-input:focus,
+.ge-inpaint-popup-input:focus,
+.ge-adj-cb-tone-select:focus,
+.ge-edge-input:focus,
+.ge-inpaint-prompt:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 18%, transparent);
+}
 /* Busy state on AI tool buttons — whirlpool + verb text side by side. */
 .ge-btn-processing {
   display: inline-flex;
@@ -27936,7 +28077,7 @@ button .spinner-whirlpool {
   transition: opacity 0.1s;
 }
 .ge-layer-btn:hover { opacity: 0.8; }
-.ge-layer-btn.danger:hover { color: var(--red); opacity: 1; }
+.ge-layer-btn.danger:hover { color: var(--destructive); opacity: 1; }
 
 /* Crop apply button */
 .ge-crop-apply {
@@ -30412,7 +30553,7 @@ body.doc-find-active .doc-editor-highlight * {
    overlay; outlined extra-bright for the currently-focused one. */
 body.doc-find-active mark.doc-find-mark {
   background: var(--accent) !important;
-  color: var(--bg) !important;
+  color: #fff !important;
 }
 body.doc-find-active mark.doc-find-mark.current {
   background: var(--accent) !important;
@@ -31024,8 +31165,8 @@ body.doc-find-active mark.doc-find-mark.current {
   padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit;
 }
 /* The ✕ glyph itself reads in accent. */
-.email-discard-btn svg { color: var(--accent-primary, var(--red)); opacity: 1; }
-.email-discard-btn:hover { opacity: 1; color: var(--red, #e55); border-color: var(--red, #e55); }
+.email-discard-btn svg { color: var(--destructive); opacity: 1; }
+.email-discard-btn:hover { opacity: 1; color: var(--destructive); border-color: var(--destructive); }
 
 /* Compose email "more" menu button — icon only, matches draft btn height */
 #doc-email-more-btn {
@@ -33149,7 +33290,7 @@ body.notes-mobile-mode.notes-drag-mode .note-card-pin.active {
   color-scheme: dark light;
   box-sizing: border-box;
 }
-.note-reminder-date-input:focus { border-color: var(--accent); }
+.note-reminder-date-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--red)) 18%, transparent); }
 .note-reminder-menu-confirm {
   font-weight: 600;
   color: var(--accent);
@@ -33307,7 +33448,7 @@ body.notes-mobile-mode.notes-drag-mode .note-card-pin.active {
   opacity: 1;
   background: color-mix(in srgb, var(--fg) 10%, transparent);
 }
-.note-card-delete:hover { color: var(--red); }
+.note-card-delete:hover { color: var(--destructive); }
 
 /* Tag/label */
 .note-card-label {
@@ -33810,7 +33951,6 @@ body.notes-mobile-mode.notes-drag-mode .note-card-pin.active {
   padding: 32px 16px;
   font-size: 13px;
   opacity: 0.55;
-  font-style: italic;
 }
 
 /* Bulk action bar */
@@ -34015,7 +34155,7 @@ body.notes-mobile-mode.notes-drag-mode .note-card-pin.active {
   padding: 2px;
   transition: opacity 0.15s;
 }
-.note-delete-btn:hover { opacity: 0.8; color: var(--red); }
+.note-delete-btn:hover { opacity: 0.8; color: var(--destructive); }
 .note-archive-btn {
   background: none; border: none; color: var(--fg); opacity: 0.2; cursor: pointer; padding: 2px; transition: opacity 0.15s;
 }
@@ -34496,7 +34636,7 @@ body.notes-mobile-mode.notes-drag-mode .note-card-pin.active {
    stylesheets clamp `svg { width: ... }` globally and that shrinks them. */
 .note-form-icon-btn svg { width: 31px !important; height: 31px !important; }
 .note-form-icon-btn:hover { opacity: 1; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
-.note-form-delete-btn:hover { color: var(--red); border-color: color-mix(in srgb, var(--red) 50%, var(--border)); background: color-mix(in srgb, var(--red) 8%, transparent); }
+.note-form-delete-btn:hover { color: var(--destructive); border-color: color-mix(in srgb, var(--destructive) 50%, var(--border)); background: color-mix(in srgb, var(--destructive) 8%, transparent); }
 
 /* Draw mode — canvas + small toolbar */
 .note-form-draw-wrap {
@@ -35556,7 +35696,7 @@ button.cal-view-btn {
 .cal-day { background:var(--bg); min-height:78px; padding:3px; cursor:pointer; position:relative; transition:background 0.12s; overflow:hidden; }
 .cal-day:hover { background:color-mix(in srgb, var(--fg) 5%, var(--bg)); }
 .cal-day.cal-today { box-shadow:inset 0 0 0 2px var(--accent, var(--red)); background:color-mix(in srgb, var(--accent, var(--red)) 15%, var(--bg)); border-radius:8px; }
-.cal-day.cal-today .cal-day-num { color:var(--bg); font-weight:800; background:var(--accent, var(--red)); border-radius:10px; padding:1px 6px; display:inline-block; opacity:1; line-height:1.3; }
+.cal-day.cal-today .cal-day-num { color:#fff; font-weight:800; background:var(--accent, var(--red)); border-radius:10px; padding:1px 6px; display:inline-block; opacity:1; line-height:1.3; }
 /* Selected day — same square geometry as `.cal-today` so the two read as
    peers, but rendered as an outline + softer fill instead of a solid
    accent block. Today wins when both classes are on the same cell. */
@@ -36009,7 +36149,7 @@ button.cal-view-btn {
   color: var(--accent, var(--red));
   vertical-align: 1px;
 }
-.cal-agenda-empty { font-size:11px; opacity:0.4; padding:8px; font-style:italic; }
+.cal-agenda-empty { font-size:11px; opacity:0.4; padding:8px; }
 .cal-agenda-event { display:flex; gap:8px; padding:8px; border-radius:5px; cursor:pointer; align-items:center; position:relative; }
 .cal-agenda-event:hover { background:color-mix(in srgb, var(--fg) 6%, transparent); }
 .cal-agenda-event .cal-event-more,
@@ -36264,7 +36404,7 @@ button.cal-event-more:hover { opacity:1 !important; }
 .cal-form-bespoke.cal-form-bg-image .cal-btn-primary {
   background: var(--accent, var(--red));
   border-color: var(--accent, var(--red));
-  color: var(--bg);
+  color: #fff;
 }
 .cal-form-close {
   position: absolute; top: 10px; right: 12px;
@@ -36447,7 +36587,7 @@ button.cal-event-more:hover { opacity:1 !important; }
   }
 }
 .cal-input { background:color-mix(in srgb, var(--fg) 5%, var(--bg)); border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--fg); font-size:12px; width:100%; box-sizing:border-box; }
-.cal-input:focus { outline:none; border-color:var(--accent); }
+.cal-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent, var(--red)) 18%, transparent); }
 .cal-input-time { width:auto; flex:1; }
 select.cal-input { appearance:auto; }
 textarea.cal-input { resize:vertical; font-family:inherit; }
@@ -36455,10 +36595,13 @@ textarea.cal-input { resize:vertical; font-family:inherit; }
 .cal-form-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
 button.cal-btn { background:color-mix(in srgb, var(--fg) 8%, transparent); border:1px solid var(--border); color:var(--fg); border-radius:5px; padding:0 14px; height:28px; font-size:11px; font-weight:500; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; transition:background 0.15s, border-color 0.15s; }
 button.cal-btn:hover { background:color-mix(in srgb, var(--fg) 14%, transparent); }
-button.cal-btn.cal-btn-primary { background:var(--accent, var(--red)); color:var(--bg); border-color:var(--accent, var(--red)); }
+button.cal-btn.cal-btn-primary { background:var(--accent, var(--red)); color:#fff; border-color:var(--accent, var(--red)); }
 button.cal-btn.cal-btn-primary:hover { opacity:0.9; background:var(--accent, var(--red)); }
-button.cal-btn.cal-btn-danger { color:var(--accent, var(--red)); border-color:var(--accent, var(--red)); background:transparent; }
-button.cal-btn.cal-btn-danger:hover { background:var(--accent, var(--red)); color:var(--bg); }
+/* Destructive (event delete): use the semantic destructive token, not the
+   brand accent. Post-rebrand --accent/--red is indigo, which made "danger"
+   read identically to the primary action. */
+button.cal-btn.cal-btn-danger { color:var(--destructive); border-color:color-mix(in srgb, var(--destructive) 55%, var(--border)); background:transparent; }
+button.cal-btn.cal-btn-danger:hover { background:var(--destructive); color:#fff; border-color:var(--destructive); }
 @media (max-width: 600px) {
   .cal-modal-container { max-width:100vw; width:100vw; border-radius:0; max-height:100vh; height:100vh; }
   .cal-day { min-height:44px; padding:2px; }
@@ -37179,7 +37322,7 @@ body.research-panel-view #research-divider { display:none; }
   transition:opacity 0.15s;
 }
 .research-lib-open:hover { opacity:1; }
-.research-lib-delete:hover { opacity:1; color:#f44336; }
+.research-lib-delete:hover { opacity:1; color:var(--destructive); }
 .research-badge {
   background:var(--accent-primary, var(--red)); border-radius:50%;
   width:6px; height:6px; margin-left:auto; display:inline-block; flex-shrink:0;

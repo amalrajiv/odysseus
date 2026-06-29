@@ -1,0 +1,17 @@
+import puppeteer from 'puppeteer-core';
+const B='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser';
+const BASE='http://127.0.0.1:7077/';
+const profile=process.argv[2], theme=process.argv[3];
+const THEMES={dark:{colors:{bg:'#111114',fg:'#e7e7ec',panel:'#17171c',border:'#26262e',red:'#4f46e5'},font:'sans',bgPattern:'none'},light:{colors:{bg:'#fbfbfc',fg:'#1b1b1f',panel:'#ffffff',border:'#e5e5ea',red:'#4f46e5'},font:'sans',bgPattern:'none'}};
+const r=await fetch(BASE+'api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'qa',password:'qa-visual-QA-12345'})});
+const sc=(r.headers.get('set-cookie')||'').match(/^([^=]+)=([^;]+)/);
+const b=await puppeteer.launch({executablePath:B,headless:'new',userDataDir:profile,args:['--no-sandbox','--disable-gpu']});
+const p=await b.newPage();
+await p.setCookie({name:sc[1],value:sc[2],domain:'127.0.0.1',path:'/'});
+await p.goto(BASE,{waitUntil:'domcontentloaded'});
+await p.evaluate(t=>{localStorage.setItem('odysseus-theme',JSON.stringify(t));localStorage.setItem('odysseus-ui-scale','100');},THEMES[theme]);
+await p.goto(BASE,{waitUntil:'domcontentloaded'});
+await new Promise(r=>setTimeout(r,2000));
+await b.close();
+console.log('seeded',theme);
+process.exit(0);

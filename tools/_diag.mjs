@@ -1,0 +1,10 @@
+import puppeteer from 'puppeteer-core';
+const B='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser';
+const b=await puppeteer.launch({executablePath:B,headless:'new',args:['--no-sandbox','--disable-gpu','--hide-scrollbars']});
+const p=await b.newPage();
+await p.setViewport({width:800,height:500});
+await p.goto('file://'+process.cwd()+'/visual_harness.html#light',{waitUntil:'load'});
+await new Promise(r=>setTimeout(r,800));
+await p.screenshot({path:'_diag.png'});
+console.log('diag shot done');
+await b.close(); process.exit(0);
