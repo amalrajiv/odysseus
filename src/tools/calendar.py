@@ -78,8 +78,19 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
     action = (args.get("action") or "list_events").replace("-", "_").strip().lower()
     _ACTION_ALIASES = {
         "create": "create_event",
+        "add": "create_event",
+        "new": "create_event",
+        "schedule": "create_event",
+        "add_event": "create_event",
+        "new_event": "create_event",
+        "create_calendar_event": "create_event",
         "update": "update_event",
+        "edit": "update_event",
+        "edit_event": "update_event",
         "delete": "delete_event",
+        "remove": "delete_event",
+        "remove_event": "delete_event",
+        "cancel": "delete_event",
         "list": "list_events",
         "events": "list_events",
         "upcoming": "list_events",
@@ -286,11 +297,19 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
             return {"response": response_text, "events": events, "exit_code": 0}
 
         elif action == "create_event":
-            summary = args.get("summary")
+            # Accept the various names models use for the event title:
+            # summary (canonical), title, name, subject, event_title.
+            summary = _first_nonempty_arg(
+                "summary", "title", "name", "subject", "event_title", "event_name"
+            )
             # Accept the various names models like to use for the start
-            # field: dtstart (canonical), start, start_time, when.
-            dtstart_str = (args.get("dtstart") or args.get("start")
-                           or args.get("start_time") or args.get("when"))
+            # field: dtstart (canonical), start, start_time, when, plus the
+            # datetime_local / datetime / start_datetime shapes local models emit.
+            dtstart_str = _first_nonempty_arg(
+                "dtstart", "start", "start_time", "when",
+                "datetime_local", "datetime", "date_time", "start_datetime",
+                "start_date", "date",
+            )
             if not summary or not dtstart_str:
                 return {"error": "summary and dtstart are required", "exit_code": 1}
 
@@ -338,6 +357,28 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
                     secs = (int(h.group(1)) * 3600 if h else 0) + (int(m.group(1)) * 60 if m else 0)
                     if secs > 0:
                         delta = timedelta(seconds=secs)
+                if delta is None:
+                    # Numeric duration in minutes/hours — the shape models emit
+                    # when they pass a number instead of a "1h"/"30m" string.
+                    mins = _first_nonempty_arg(
+                        "duration_minutes", "duration_mins", "length_minutes", "duration_min"
+                    )
+                    if mins is not None:
+                        try:
+                            mins_int = int(float(mins))
+                        except (TypeError, ValueError):
+                            mins_int = 0
+                        if mins_int > 0:
+                            delta = timedelta(minutes=mins_int)
+                    if delta is None:
+                        hrs = _first_nonempty_arg("duration_hours", "length_hours")
+                        if hrs is not None:
+                            try:
+                                hrs_float = float(hrs)
+                            except (TypeError, ValueError):
+                                hrs_float = 0.0
+                            if hrs_float > 0:
+                                delta = timedelta(hours=hrs_float)
                 if delta is not None:
                     dtend = dtstart + delta
                 elif all_day:

@@ -29,16 +29,22 @@ _TOOL_BLOCK_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Optional action verb some models wedge between the tool name and the JSON
+# body, e.g. `manage_calendar add {...}` or `manage_calendar <<<add>>> {...}`.
+# Captured separately so it can be folded back in as {"action": ...} rather
+# than dropped (which left these calls unparsed and leaking as prose).
+_TOOL_ACTION_PREFIX = r"(?:<<<\s*(\w+)\s*>>>|(\w+))\s+"
+
 # Pattern 1b: inline backtick tool calls models leak instead of proper fences, e.g.
 # `manage_calendar {"action": "list_events"}` or ``manage_calendar {...}``.
 _INLINE_TOOL_CALL_RE = re.compile(
-    rf"`{{1,2}}({_TOOL_TAGS_ALT})\s+(\{{[\s\S]*?\}})\s*`{{1,2}}",
+    rf"`{{1,2}}({_TOOL_TAGS_ALT})\s+(?:{_TOOL_ACTION_PREFIX})?(\{{[\s\S]*?\}})\s*`{{1,2}}",
     re.IGNORECASE,
 )
 
 # Pattern 1c: a response that is ONLY ``manage_calendar {"action": "list"}`` on its own line.
 _STANDALONE_TOOL_LINE_RE = re.compile(
-    rf"^\s*({_TOOL_TAGS_ALT})\s+(\{{[\s\S]*?\}})\s*$",
+    rf"^\s*({_TOOL_TAGS_ALT})\s+(?:{_TOOL_ACTION_PREFIX})?(\{{[\s\S]*?\}})\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -483,8 +489,15 @@ def _raw_web_json_to_tool_block(payload) -> Optional[ToolBlock]:
     return ToolBlock("web_search", json.dumps(content))
 
 
-def _parse_json_tool_invocation(tool_name: str, json_text: str) -> Optional[ToolBlock]:
-    """Parse ``tool_name {"action": ...}`` into a ToolBlock when JSON is a dict."""
+def _parse_json_tool_invocation(
+    tool_name: str, json_text: str, action_hint: Optional[str] = None
+) -> Optional[ToolBlock]:
+    """Parse ``tool_name {"action": ...}`` into a ToolBlock when JSON is a dict.
+
+    ``action_hint`` folds back a verb the model wrote outside the object
+    (``manage_calendar add {...}``) as ``{"action": "add", ...}`` when the
+    body doesn't already carry an action.
+    """
     tag = tool_name.lower().replace("-", "_")
     mapped = _TOOL_NAME_MAP.get(tag) or (tag if tag in TOOL_TAGS else None)
     if not mapped:
@@ -498,6 +511,9 @@ def _parse_json_tool_invocation(tool_name: str, json_text: str) -> Optional[Tool
         return None
     if not isinstance(parsed, dict):
         return None
+    if action_hint and not parsed.get("action"):
+        parsed = {"action": action_hint.lower(), **parsed}
+        body = json.dumps(parsed)
     return ToolBlock(mapped, body)
 
 
@@ -508,7 +524,9 @@ def _parse_inline_tool_calls(text: str) -> List[ToolBlock]:
     blocks: List[ToolBlock] = []
     for pattern in (_INLINE_TOOL_CALL_RE, _STANDALONE_TOOL_LINE_RE):
         for m in pattern.finditer(text):
-            block = _parse_json_tool_invocation(m.group(1), m.group(2))
+            # Groups: 1=tool, 2=<<<action>>>, 3=bare action word, 4=JSON body.
+            action_hint = m.group(2) or m.group(3)
+            block = _parse_json_tool_invocation(m.group(1), m.group(4), action_hint)
             if block:
                 blocks.append(block)
         if blocks:

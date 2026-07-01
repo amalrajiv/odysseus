@@ -60,3 +60,46 @@ def test_strip_inline_manage_calendar():
     cleaned = strip_tool_blocks(text)
     assert "manage_calendar" not in cleaned
     assert '{"action"' not in cleaned
+
+
+def test_bare_action_word_between_tool_and_json():
+    # Models wedge the action verb between the tool name and the object.
+    text = '``manage_calendar add {"title": "x"} ``'
+    blocks = parse_tool_blocks(text)
+    assert len(blocks) == 1
+    assert blocks[0].tool_type == "manage_calendar"
+    body = json.loads(blocks[0].content)
+    assert body["action"] == "add"
+    assert body["title"] == "x"
+
+
+def test_angle_wrapped_action_between_tool_and_json():
+    text = '``manage_calendar <<<add>>> {"title": "x", "datetime_local": "2026-07-03T11:30:00+05:30"} ``'
+    blocks = parse_tool_blocks(text)
+    assert len(blocks) == 1
+    assert blocks[0].tool_type == "manage_calendar"
+    body = json.loads(blocks[0].content)
+    assert body["action"] == "add"
+    assert body["datetime_local"] == "2026-07-03T11:30:00+05:30"
+
+
+def test_standalone_line_with_action_prefix():
+    text = 'manage_calendar add {"title": "x"}'
+    blocks = parse_tool_blocks(text)
+    assert len(blocks) == 1
+    assert blocks[0].tool_type == "manage_calendar"
+    assert json.loads(blocks[0].content)["action"] == "add"
+
+
+def test_action_prefix_does_not_override_explicit_action():
+    text = '`manage_calendar add {"action": "list_events"}`'
+    blocks = parse_tool_blocks(text)
+    assert len(blocks) == 1
+    assert json.loads(blocks[0].content)["action"] == "list_events"
+
+
+def test_strip_removes_prefixed_manage_calendar():
+    text = 'Sure:\n``manage_calendar add {"title": "x"} ``'
+    cleaned = strip_tool_blocks(text)
+    assert "manage_calendar" not in cleaned
+    assert '{"title"' not in cleaned
