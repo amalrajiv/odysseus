@@ -1385,6 +1385,11 @@ export function showWelcomeScreen() {
   }
   // Update send button — switches from + Chat to muted arrow on empty session
   if (window._updateSendBtnIcon) setTimeout(window._updateSendBtnIcon, 50);
+  // Restore model-picker visibility (may have been display:none from group /
+  // compare) and refresh the label for the pending / default model.
+  if (window.sessionModule && window.sessionModule.updateModelPicker) {
+    window.sessionModule.updateModelPicker();
+  }
   const ib = document.getElementById('incognito-btn');
   const _researchChk = document.getElementById('research-toggle');
   if (ib && !(_researchChk && _researchChk.checked)) ib.style.display = '';

@@ -538,7 +538,7 @@ FUNCTION_TOOL_SCHEMAS = [
         "type": "function",
         "function": {
             "name": "manage_calendar",
-            "description": "Manage calendar events. READ: action=list_events for upcoming events / schedule (optional start/end; defaults today + 14 days). WRITE: action=create_event (or update_event/delete_event) in one call — pass calendar/calendar_id with the account name when the user names one (e.g. Personal, Work); only call list_calendars when the calendar is unknown. Required for create: summary, dtstart. All-day: all_day=true and dtstart as YYYY-MM-DD. Timed: ISO datetime in user's local wall time. Event reminders via reminder_minutes (creates Notes reminder — do not also call manage_notes).",
+            "description": "Manage calendar events. READ: action=list_events for upcoming events / schedule / 'this month' (pass start/end as YYYY-MM-DD; full month = first day through first day of next month; defaults today + 14 days). After list_events succeeds, present the returned events — do not re-call. WRITE: action=create_event (or update_event/delete_event) in one call — pass calendar/calendar_id with the account name when the user names one (e.g. Personal, Work); only call list_calendars when the calendar is unknown. Required for create: summary, dtstart. All-day: all_day=true and dtstart as YYYY-MM-DD. Timed: ISO datetime in user's local wall time. Event reminders via reminder_minutes (creates Notes reminder — do not also call manage_notes).",
             "parameters": {
                 "type": "object",
                 "properties": {

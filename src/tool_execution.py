@@ -898,19 +898,28 @@ def format_tool_result(description: str, result: Dict) -> str:
             parts.append(f"**{model} responded:**\n{result['response']}")
         else:
             parts.append(result["response"])
+        resp = result.get("response") or ""
         if (
             description == "manage_calendar"
             and result.get("exit_code", 0) == 0
             and not result.get("error")
-            and any(
-                token in (result.get("response") or "")
-                for token in ("Created event", "Event already exists")
-            )
         ):
-            parts.append(
-                "(Calendar write succeeded — reply in ONE short confirmation sentence; "
-                "do not re-plan dates, re-list calendars, or call more tools.)"
-            )
+            if any(token in resp for token in ("Created event", "Event already exists")):
+                parts.append(
+                    "(Calendar write succeeded — reply in ONE short confirmation sentence; "
+                    "do not re-plan dates, re-list calendars, or call more tools.)"
+                )
+            elif "Found " in resp and " event" in resp:
+                parts.append(
+                    "(Calendar list succeeded — present these events grouped by date in your "
+                    "reply, keeping the [#event-uid] links. Do not re-call list_events, manually "
+                    "convert every timestamp, or re-plan; the tool output is complete.)"
+                )
+            elif resp.startswith("No events between "):
+                parts.append(
+                    "(Calendar list succeeded — tell the user there are no events in that range. "
+                    "Do not re-call list_events or speculate about missing data.)"
+                )
     elif "results" in result:
         parts.append(result["results"])
     elif "session_id" in result and "name" in result:
