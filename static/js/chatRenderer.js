@@ -636,15 +636,14 @@ function _fmtCtx(n) {
 }
 
 /**
- * Apply model color to a role element (sets color + dot color).
+ * Apply provider logo to a role element. Text/dot colors come from CSS theme
+ * tokens (see .msg-ai .role) — we no longer paint per-model hash colors on
+ * the label, which clashed with the Ariadne indigo palette.
  */
 export function applyModelColor(roleEl, modelName) {
-  if (!modelName) return;
-  const color = modelColor(modelName);
-  if (color) {
-    roleEl.style.color = color;
-    roleEl.style.setProperty('--model-dot', color);
-  }
+  if (!roleEl || !modelName) return;
+  roleEl.style.removeProperty('color');
+  roleEl.style.removeProperty('--model-dot');
   // Replace generic dot with provider logo if available
   const logo = providerLogo(modelName);
   const existingLogo = roleEl.querySelector('.role-provider-logo');

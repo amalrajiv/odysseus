@@ -206,11 +206,21 @@ const ADV_KEYS = [
   { key: 'toggleActive',       css: '--toggle-active',     label: 'Toggle On',        group: 'Controls' },
 ];
 
+function mixHex(fgHex, bgHex, fgWeight) {
+  const fg = hexToRgb(fgHex) || { r: 231, g: 231, b: 236 };
+  const bg = hexToRgb(bgHex) || { r: 17, g: 17, b: 20 };
+  const w = Math.max(0, Math.min(1, fgWeight));
+  const ch = (c) => Math.round(fg[c] * w + bg[c] * (1 - w)).toString(16).padStart(2, '0');
+  return `#${ch('r')}${ch('g')}${ch('b')}`;
+}
+
 function computeAdvancedDefaults(colors) {
   const syn = deriveSyntaxColors(colors);
   const red = colors.red || '#e06c75';
   return {
-    userBubbleBg: colors.bg,
+    // Subtle lift off --bg (matches the CSS fallback mix) so user bubbles read
+    // as distinct from the canvas without competing with AI/panel surfaces.
+    userBubbleBg: mixHex(colors.fg, colors.bg, 0.08),
     aiBubbleBg: colors.panel,
     bubbleBorder: colors.border,
     sidebarBg: colors.panel,
