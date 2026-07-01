@@ -340,7 +340,13 @@ class GlobTool:
         if err:
             return {"error": err, "exit_code": 1}
         if not paths:
-            return {"output": f"No files matching {pattern!r} under {root}", "exit_code": 0}
+            norm_pat = pattern.replace("\\", "/")
+            # Do not echo escaping literals in the not-found message — they can
+            # leak absolute host paths via ../ chains (path oracle).
+            display_pat = pattern
+            if os.path.isabs(norm_pat) or "/../" in norm_pat or norm_pat.startswith("../"):
+                display_pat = "<pattern>"
+            return {"output": f"No files matching {display_pat!r} under {root}", "exit_code": 0}
         out = "\n".join(paths)
         if len(paths) >= _CODENAV_MAX_HITS:
             out += f"\n... [capped at {_CODENAV_MAX_HITS} files]"
