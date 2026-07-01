@@ -21,13 +21,23 @@ def test_native_select_options_use_theme_tokens():
     assert "background-color: var(--select-option-active-bg);" in css
 
 
-def test_light_theme_keeps_native_selects_light():
+def test_native_selects_follow_theme_tokens_so_they_stay_readable_on_light():
+    """Native <select> boxes stay readable on light themes.
+
+    The old hardcoded ``:root.light { --select-bg: #eaeaea; ... }`` palette was
+    intentionally removed (theme.js never adds a ``.light`` class — light themes
+    ship as inline theme vars / selectable presets; see the NOTE in style.css).
+    Readability is now guaranteed structurally: the select box drives its
+    background/foreground from ``--select-bg`` / ``--select-fg``, which resolve
+    to the active theme's ``--bg`` / ``--fg`` — so a light theme yields a light
+    select rather than a hardcoded dark one.
+    """
     css = _style_text()
 
-    light_theme_start = css.index(":root.light {")
-    light_theme_end = css.index("}", light_theme_start)
-    light_theme_block = css[light_theme_start:light_theme_end]
+    # Tokens follow the active theme (light theme => light --bg/--fg => light select).
+    assert "--select-bg: var(--bg);" in css
+    assert "--select-fg: var(--fg);" in css
 
-    assert "--select-bg: #eaeaea;" in light_theme_block
-    assert "--select-option-bg: var(--panel);" in light_theme_block
-    assert ":root.light select { color-scheme: light; }" in css
+    # The select rule consumes those tokens instead of hardcoding colors.
+    assert "background-color: var(--select-bg);" in css
+    assert "color: var(--select-fg);" in css

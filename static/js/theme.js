@@ -17,7 +17,7 @@ export const THEMES = {
   // applied as inline theme vars so every color-mix token recomputes for light.
   // (Replaces the old dead `:root.light` block in style.css.)
   daylight:   { bg:'#fbfbfc', fg:'#1b1b1f', panel:'#ffffff', border:'#e5e5ea', red:'#4f46e5' },
-  // Classic Odysseus cyan — kept as a selectable preset.
+  // Classic Ariadne cyan — kept as a selectable preset.
   dark:       { bg:'#282c34', fg:'#9cdef2', panel:'#111111', border:'#355a66', red:'#e06c75' },
   light:      { bg:'#f0ebe3', fg:'#5a5248', panel:'#faf6f0', border:'#d4cdc2', red:'#c47d5a' },
   midnight:   { bg:'#0d1117', fg:'#c9d1d9', panel:'#161b22', border:'#30363d', red:'#f85149' },
