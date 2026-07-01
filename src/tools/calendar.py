@@ -247,7 +247,9 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
                 CalendarEvent.dtend > start_dt,
                 CalendarEvent.status != "cancelled",
             )
-            calendar_filter = args.get("calendar")
+            calendar_filter = _first_nonempty_arg(
+                "calendar", "calendar_id", "calendar_href", "calendar_name"
+            )
             if calendar_filter:
                 q = q.filter(
                     (CalendarEvent.calendar_id == calendar_filter) |
@@ -304,10 +306,11 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
             )
             # Accept the various names models like to use for the start
             # field: dtstart (canonical), start, start_time, when, plus the
-            # datetime_local / datetime / start_datetime shapes local models emit.
+            # datetime_local / datetime / start_datetime / datetime_start
+            # shapes local models emit (both word orders).
             dtstart_str = _first_nonempty_arg(
-                "dtstart", "start", "start_time", "when",
-                "datetime_local", "datetime", "date_time", "start_datetime",
+                "dtstart", "start", "start_time", "start_datetime", "datetime_start",
+                "start_dt", "when", "datetime_local", "datetime", "date_time",
                 "start_date", "date",
             )
             if not summary or not dtstart_str:
@@ -315,8 +318,12 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
 
             # Accept either an href OR a calendar name/short-id like "Main"
             # or "62e545d8" — saves the model from having to memorize hrefs
-            # after a `list_calendars` call returned short prefixes.
-            cal_href = args.get("calendar_href") or args.get("calendar")
+            # after a `list_calendars` call returned short prefixes. calendar_id
+            # is the shape most models reach for; without it a user's picked
+            # calendar was silently ignored and events fell to the default.
+            cal_href = _first_nonempty_arg(
+                "calendar_href", "calendar", "calendar_id", "calendar_name", "cal_id"
+            )
             cal = None
             if cal_href:
                 cal = (_calendar_query()
@@ -339,7 +346,9 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
                 dtstart, dtstart_is_utc = _parse_event_dt(dtstart_str)
             except ValueError as e:
                 return {"error": f"Could not parse dtstart {dtstart_str!r}: {e}", "exit_code": 1}
-            dtend_raw = args.get("dtend") or args.get("end") or args.get("end_time")
+            dtend_raw = _first_nonempty_arg(
+                "dtend", "end", "end_time", "end_datetime", "datetime_end", "end_dt",
+            )
             if dtend_raw:
                 try:
                     dtend, dtend_is_utc = _parse_event_dt(dtend_raw)

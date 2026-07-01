@@ -93,6 +93,49 @@ async def test_create_event_accepts_title_datetime_local_and_duration_minutes():
     assert ev["dtend"] == "2026-07-03T07:00:00Z"
 
 
+async def test_create_event_accepts_datetime_start_end_and_calendar_id():
+    # Reproduces a second wild transcript: add_event + title + datetime_start /
+    # datetime_end + calendar_id (the exact names the model reached for). These
+    # used to fail "summary and dtstart are required", and calendar_id was
+    # ignored so the user's picked calendar was silently dropped.
+    import uuid as _uuid
+    from src.tool_implementations import do_manage_calendar
+
+    owner = "cal-dtnames-" + uuid.uuid4().hex[:8]
+    db = _TS()
+    for name in ["Work", "Personal"]:
+        db.add(cdb.CalendarCal(id=str(_uuid.uuid4()), owner=owner, name=name))
+    db.commit()
+    db.close()
+
+    res = await do_manage_calendar(
+        json.dumps({
+            "action": "add_event",
+            "calendar_id": "personal",
+            "title": "test",
+            "datetime_start": "2026-07-02T18:00:00+05:30",
+            "datetime_end": "2026-07-02T19:00:00+05:30",
+        }),
+        owner=owner,
+    )
+    assert res.get("exit_code", 0) == 0, res
+    assert res.get("uid"), res
+
+    listing = await do_manage_calendar(
+        json.dumps({"action": "list_events", "start": "2026-07-01", "end": "2026-07-05"}),
+        owner=owner,
+    )
+    events = listing.get("events", [])
+    assert len(events) == 1, listing
+    ev = events[0]
+    assert ev["summary"] == "test"
+    # 18:00 IST (+05:30) == 12:30Z, 19:00 IST == 13:30Z.
+    assert ev["dtstart"] == "2026-07-02T12:30:00Z"
+    assert ev["dtend"] == "2026-07-02T13:30:00Z"
+    # calendar_id: "personal" must route to the Personal calendar, not default.
+    assert ev["calendar"] == "Personal", ev
+
+
 @pytest.mark.parametrize("content_prefix", ["add ", "<<<add>>> "])
 async def test_action_verb_outside_json_still_creates_event(content_prefix):
     # Reproduces the failing transcript: the model put the action verb outside
