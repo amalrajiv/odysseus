@@ -136,6 +136,31 @@ async def test_create_event_accepts_datetime_start_end_and_calendar_id():
     assert ev["calendar"] == "Personal", ev
 
 
+async def test_create_event_accepts_all_day_event_flag():
+    from src.tool_implementations import do_manage_calendar
+
+    owner = "cal-allday-" + uuid.uuid4().hex[:8]
+    res = await do_manage_calendar(
+        json.dumps({
+            "action": "create",
+            "summary": "Review Business Plan",
+            "start_time": "2026-07-04T00:00:00+05:30",
+            "end_time": "2026-07-05T00:00:00+05:30",
+            "all_day_event": True,
+            "calendar_id": "home",
+        }),
+        owner=owner,
+    )
+    assert res.get("exit_code", 0) == 0, res
+
+    listing = await do_manage_calendar(
+        json.dumps({"action": "list_events", "start": "2026-07-01", "end": "2026-07-10"}),
+        owner=owner,
+    )
+    ev = listing.get("events", [{}])[0]
+    assert ev.get("all_day") is True, ev
+
+
 @pytest.mark.parametrize("content_prefix", ["add ", "<<<add>>> "])
 async def test_action_verb_outside_json_still_creates_event(content_prefix):
     # Reproduces the failing transcript: the model put the action verb outside

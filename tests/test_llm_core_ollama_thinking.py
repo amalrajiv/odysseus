@@ -163,3 +163,28 @@ class TestThinkSuppression:
             monkeypatch, "http://127.0.0.1:11435/v1/chat/completions", "qwen3:14b"
         )
         assert payload.get("think") is False
+
+
+class TestSelfHostedThinkingSuppression:
+    """llama.cpp / LM Studio / MLX local OpenAI-compat servers."""
+
+    def test_chat_template_kwargs_for_local_llamacpp_qwen3(self, monkeypatch):
+        monkeypatch.setattr(
+            llm_core, "_is_self_hosted_openai_compatible", lambda url: True
+        )
+        payload = _capture_payload(
+            monkeypatch, "http://127.0.0.1:8080/v1/chat/completions", "qwen3.6:35b-mlx"
+        )
+        assert payload.get("chat_template_kwargs") == {"enable_thinking": False}
+        # Local /v1 also gets Ollama's think:false — harmless on llama.cpp, helps Ollama.
+        assert payload.get("think") is False
+
+    def test_no_suppression_for_openai_even_with_qwen_name(self, monkeypatch):
+        monkeypatch.setattr(
+            llm_core, "_is_self_hosted_openai_compatible", lambda url: False
+        )
+        payload = _capture_payload(
+            monkeypatch, "https://api.openai.com/v1/chat/completions", "qwen3:14b"
+        )
+        assert "chat_template_kwargs" not in payload
+        assert "think" not in payload

@@ -341,7 +341,12 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
             if not cal:
                 cal = _ensure_default_calendar(db, owner)
 
-            all_day = bool(args.get("all_day", False))
+            all_day = bool(
+                args.get("all_day")
+                or args.get("all_day_event")
+                or args.get("is_all_day")
+                or args.get("allday")
+            )
             try:
                 dtstart, dtstart_is_utc = _parse_event_dt(dtstart_str)
             except ValueError as e:
