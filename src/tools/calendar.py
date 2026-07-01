@@ -81,6 +81,10 @@ async def do_manage_calendar(content: str, owner: Optional[str] = None) -> Dict:
         "update": "update_event",
         "delete": "delete_event",
         "list": "list_events",
+        "events": "list_events",
+        "upcoming": "list_events",
+        "list_cals": "list_calendars",
+        "calendars": "list_calendars",
     }
     action = _ACTION_ALIASES.get(action, action)
     db = SessionLocal()

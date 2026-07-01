@@ -715,3 +715,39 @@ _Update as phases complete (date · phase · summary · QA artifacts)._
     `confirm-{default,danger}-{dark,light}.png`, `skeleton-{dark,light}.png`,
     `tasksrun-{dark,light}.png`, `{composer,picker-open}-{dark,light}.png`,
     `{skiplink,sheet-tasks,toast-live}-{dark,light}.png`.
+
+---
+
+## Beyond the audit — new feature work
+
+- **2026-06-30 · ⌘K command palette (`static/js/commandPalette.js`).** A unified fuzzy
+  launcher that ties every surface together (Raycast/Linear-style), opened with `⌘K`/`Ctrl+K`
+  or either search button. Built as a thin **router**, not a new subsystem: it owns only the
+  overlay, fuzzy search, and keyboard/a11y; every result delegates to an existing module or UI
+  control, so no business logic is duplicated.
+  - **Six sources**, grouped + boosted by value: **Actions** (open any tool window, new chat,
+    incognito, toggle sidebar — opens by clicking the existing tool button, guarded by an
+    `_isModalOpen` check so it never toggle-minimizes an already-open tool), **Slash commands**
+    (from the `COMMANDS` registry — selecting inserts the token into the composer so args can be
+    added), **Chats** (`sessionModule.getSessions()`), **Memory** (`/api/memory` → opens Brain +
+    prefills its search), **Documents** (`/api/documents/library` → opens Library), **Contacts**
+    (`/api/contacts/list` → inserts the name into the composer). Async sources are fetched on
+    open and cached ~20s.
+  - **Fuzzy match**: subsequence scorer with prefix / consecutive-run / word-boundary bonuses
+    and multi-term AND semantics, plus per-group boosts so higher-value groups win ties. Empty
+    query shows a launcher view (recent chats + primary actions).
+  - **⌘K conflict resolved without regression**: `⌘K` and both search buttons previously opened
+    `searchChatModule` (deep message search). They now open the palette; message search is
+    preserved as a first-class **"Search messages for …"** result that delegates to the
+    untouched `searchChatModule`. The keyboard handler falls back to `searchChatModule` if the
+    palette module is ever absent.
+  - **A11y**: `role="dialog"`/`aria-modal`, combobox input with `aria-activedescendant`,
+    `role="listbox"`/`option` rows, live result count, full `↑↓`/`Tab`/`Enter`/`Esc`/`Home`/`End`
+    nav, focus returns to the opener on close, and the palette is the top priority in the global
+    Esc chain. Honors `prefers-reduced-motion`.
+  - **Wiring** (4 files, contained): new `commandPalette.js`; `style.css` `.cmdk-*` styles
+    (tokens, dark/light, full-screen sheet ≤640px); `app.js` (import, init, repoint the two
+    search buttons, inject into `initKeyboardShortcuts`, add to the Esc chain); `keyboard-shortcuts.js`
+    (`⌘K` branch). `searchChatModule` and `#search-overlay` left fully intact.
+  - Verified visually in dark + light, desktop + mobile (full-screen sheet); `node --check` +
+    lint clean.

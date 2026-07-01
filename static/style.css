@@ -38146,6 +38146,195 @@ body.theme-frosted .modal {
   color: var(--accent, var(--red));
 }
 
+/* ══════════════════ ⌘K Command palette ══════════════════ */
+.cmdk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  background: color-mix(in srgb, var(--bg, #000) 55%, rgba(0, 0, 0, 0.55));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: cmdk-overlay-in 0.14s var(--ease-out, ease-out);
+}
+.cmdk-overlay.hidden { display: none; }
+@keyframes cmdk-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+
+.cmdk-panel {
+  width: 640px;
+  max-width: 92vw;
+  max-height: 64vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel, var(--bg, #1c1f24));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px color-mix(in srgb, var(--fg) 6%, transparent);
+  overflow: hidden;
+  animation: cmdk-panel-in 0.16s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+@keyframes cmdk-panel-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cmdk-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.cmdk-input-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--fg-muted, #8a8f98);
+  display: flex;
+}
+.cmdk-input-icon svg { width: 18px; height: 18px; }
+.cmdk-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg, #e6e6e6);
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 0;
+}
+.cmdk-input::placeholder { color: color-mix(in srgb, var(--fg) 34%, transparent); }
+
+.cmdk-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  scroll-padding: 6px;
+}
+.cmdk-group {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted, #8a8f98);
+  padding: 10px 10px 4px;
+  opacity: 0.8;
+}
+.cmdk-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 10px;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  user-select: none;
+}
+.cmdk-item-active {
+  background: color-mix(in srgb, var(--accent, var(--red)) 16%, transparent);
+}
+.cmdk-item-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-muted, #8a8f98);
+}
+.cmdk-item-icon svg { width: 17px; height: 17px; }
+.cmdk-item-active .cmdk-item-icon { color: var(--accent, var(--red)); }
+.cmdk-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cmdk-item-title {
+  color: var(--fg, #e6e6e6);
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmdk-item-sub {
+  color: var(--fg-muted, #8a8f98);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmdk-item-hint {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--fg-muted, #8a8f98);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-sm, 6px);
+  padding: 2px 7px;
+  opacity: 0;
+}
+.cmdk-item-active .cmdk-item-hint { opacity: 0.85; }
+.cmdk-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--fg-muted, #8a8f98);
+  font-size: 14px;
+}
+.cmdk-empty strong { color: var(--fg, #e6e6e6); }
+
+.cmdk-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--fg) 3%, transparent);
+}
+.cmdk-hints {
+  display: flex;
+  gap: 14px;
+  font-size: 11.5px;
+  color: var(--fg-muted, #8a8f98);
+}
+.cmdk-hints span { display: inline-flex; align-items: center; gap: 5px; }
+.cmdk-footer kbd {
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  font-size: 11px;
+  min-width: 16px;
+  text-align: center;
+  padding: 1px 5px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  color: var(--fg-muted, #8a8f98);
+}
+.cmdk-count { font-size: 11.5px; color: var(--fg-muted, #8a8f98); }
+
+@media (max-width: 640px) {
+  .cmdk-overlay { padding-top: 0; align-items: stretch; }
+  .cmdk-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+  .cmdk-footer { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmdk-overlay, .cmdk-panel { animation: none; }
+}
+
 /* ══ iOS focus-zoom fix — touch devices only; desktop sizes untouched ══
    16px is the threshold below which iOS Safari auto-zooms on focus.
    Selects and date/time inputs are excluded on purpose — they open native

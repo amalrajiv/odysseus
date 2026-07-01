@@ -49,7 +49,7 @@ export function _matchesCombo(e, combo, isMac = IS_MAC) {
 export function initKeyboardShortcuts(modules) {
   const {
     el, Storage, sessionModule, uiModule, chatModule,
-    adminModule, settingsModule, searchChatModule,
+    adminModule, settingsModule, searchChatModule, commandPaletteModule,
     _closeCompareIfActive, _deactivateIncognito, API_BASE
   } = modules;
 
@@ -146,7 +146,11 @@ export function initKeyboardShortcuts(modules) {
 
     if (_matchesCombo(e, kb.search)) {
       e.preventDefault();
-      if (searchChatModule) {
+      // ⌘K opens the unified command palette. Deep message search is still
+      // reachable from inside it (the "Search messages" result).
+      const palette = commandPaletteModule || window._commandPalette;
+      if (palette) palette.toggle();
+      else if (searchChatModule) {
         searchChatModule.isOpen() ? searchChatModule.closeSearch() : searchChatModule.openSearch();
       }
       return;

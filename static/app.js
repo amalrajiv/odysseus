@@ -14,6 +14,7 @@ import chatModule from './js/chat.js';
 import compareModule from './js/compare/index.js';
 import documentModule from './js/document.js';
 import searchChatModule from './js/search-chat.js';
+import commandPalette from './js/commandPalette.js';
 import { makeWindowDraggable } from './js/windowDrag.js';
 import markdownModule from './js/markdown.js';
 import chatRenderer from './js/chatRenderer.js';
@@ -500,6 +501,12 @@ function initializeEventListeners() {
       // Priority order: topmost overlay first. Close exactly one per press
       // so a window stacked on another (e.g. scoreboard over compare) only
       // dismisses the top one, not both.
+
+      // Command palette sits above everything (z-modal) — close it first.
+      if (commandPalette && commandPalette.isOpen()) {
+        commandPalette.close();
+        return;
+      }
 
       // Scoreboard sits on top of the compare window — close it first.
       const scoreboardOverlay = document.getElementById('scoreboard-overlay');
@@ -3340,7 +3347,7 @@ function initializeEventListeners() {
   // Keyboard shortcuts (extracted to js/keyboard-shortcuts.js)
   initKeyboardShortcuts({
     el, Storage, sessionModule, uiModule, chatModule,
-    adminModule, settingsModule, searchChatModule,
+    adminModule, settingsModule, searchChatModule, commandPaletteModule: commandPalette,
     _closeCompareIfActive, _deactivateIncognito, API_BASE
   });
   
@@ -3404,17 +3411,19 @@ function startOdysseusApp() {
       documentModule.loadSessionDocs(_curSession);
     }
   }  
-  // Initialize search chat module
+  // Initialize search chat module (still used for deep message search, now
+  // reached through the command palette's "Search messages" result).
   if (searchChatModule) {
     searchChatModule.init(API_BASE);
   }
+  // ⌘K command palette — unified launcher over actions, chats, memories,
+  // docs, contacts, and slash commands.
+  commandPalette.init(API_BASE);
 
-  // Search buttons — icon rail + sidebar
+  // Search buttons — icon rail + sidebar both open the command palette.
   const railSearchBtn = el('rail-search-btn');
   if (railSearchBtn) {
-    railSearchBtn.addEventListener('click', () => {
-      if (searchChatModule) searchChatModule.openSearch();
-    });
+    railSearchBtn.addEventListener('click', () => commandPalette.open());
   }
 
   // Rail tool buttons — delegate to sidebar tool buttons
@@ -3511,9 +3520,7 @@ function startOdysseusApp() {
 
   const sidebarSearchBtn = el('sidebar-search-btn');
   if (sidebarSearchBtn) {
-    sidebarSearchBtn.addEventListener('click', () => {
-      if (searchChatModule) searchChatModule.openSearch();
-    });
+    sidebarSearchBtn.addEventListener('click', () => commandPalette.open());
   }
   // Modify form submit to handle special modes
   const chatForm = document.getElementById('chat-form');

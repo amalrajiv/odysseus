@@ -538,13 +538,13 @@ FUNCTION_TOOL_SCHEMAS = [
         "type": "function",
         "function": {
             "name": "manage_calendar",
-            "description": "Manage calendar events: list events in a date range, create, update, delete. Each event can carry a tag/category (event_type) and importance level. Resolve relative dates like today/tomorrow against the 'Current date and time' system context, then pass ISO 8601 datetimes in the user's local wall time; for all-day events set all_day=true and pass YYYY-MM-DD. For event reminders/alarms, pass reminder_minutes; the tool creates the Odysseus note reminder, so do not also call manage_notes for the same reminder.",
+            "description": "Manage calendar events. READ: action=list_events for upcoming events / schedule (optional start/end; defaults today + 14 days). WRITE: action=list_calendars first to pick an account, then create_event/update_event/delete_event. Each event can carry event_type and importance. Resolve relative dates against 'Current date and time' context; ISO datetimes in user's local wall time; all_day=true with YYYY-MM-DD for all-day. Event reminders via reminder_minutes (creates Notes reminder — do not also call manage_notes).",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "action": {"type": "string",
                                "enum": ["list_events", "create_event", "update_event", "delete_event", "list_calendars"],
-                               "description": "Action to perform"},
+                               "description": "list_events = upcoming events in a date range (use for 'what's on my calendar'); list_calendars = calendar accounts only (before create/update/delete); create_event/update_event/delete_event for writes"},
                     "summary": {"type": "string", "description": "Event title (for create/update)"},
                     "dtstart": {"type": "string", "description": "Start ISO datetime, or YYYY-MM-DD if all_day"},
                     "dtend": {"type": "string", "description": "End ISO datetime; defaults to +1h (or +1 day for all_day)"},

@@ -20,10 +20,26 @@ logger = logging.getLogger(__name__)
 # Regex patterns
 # ---------------------------------------------------------------------------
 
-# Pattern 1: ```bash ... ``` fenced code blocks
+# Longest tags first so e.g. list_email_accounts wins over list.
+_TOOL_TAGS_ALT = "|".join(re.escape(t) for t in sorted(TOOL_TAGS, key=len, reverse=True))
+
+# Pattern 1: ```bash ... ``` fenced code blocks (multiline or single-line JSON on one fence)
 _TOOL_BLOCK_RE = re.compile(
-    r"```(" + "|".join(TOOL_TAGS) + r")\s*\n([\s\S]*?)```",
+    rf"```({_TOOL_TAGS_ALT})(?:\s*\n|\s+)([\s\S]*?)```",
     re.IGNORECASE,
+)
+
+# Pattern 1b: inline backtick tool calls models leak instead of proper fences, e.g.
+# `manage_calendar {"action": "list_events"}` or ``manage_calendar {...}``.
+_INLINE_TOOL_CALL_RE = re.compile(
+    rf"`{{1,2}}({_TOOL_TAGS_ALT})\s+(\{{[\s\S]*?\}})\s*`{{1,2}}",
+    re.IGNORECASE,
+)
+
+# Pattern 1c: a response that is ONLY ``manage_calendar {"action": "list"}`` on its own line.
+_STANDALONE_TOOL_LINE_RE = re.compile(
+    rf"^\s*({_TOOL_TAGS_ALT})\s+(\{{[\s\S]*?\}})\s*$",
+    re.IGNORECASE | re.MULTILINE,
 )
 
 # Pattern 2: [TOOL_CALL] ... [/TOOL_CALL] blocks (some models use this format)
@@ -467,6 +483,39 @@ def _raw_web_json_to_tool_block(payload) -> Optional[ToolBlock]:
     return ToolBlock("web_search", json.dumps(content))
 
 
+def _parse_json_tool_invocation(tool_name: str, json_text: str) -> Optional[ToolBlock]:
+    """Parse ``tool_name {"action": ...}`` into a ToolBlock when JSON is a dict."""
+    tag = tool_name.lower().replace("-", "_")
+    mapped = _TOOL_NAME_MAP.get(tag) or (tag if tag in TOOL_TAGS else None)
+    if not mapped:
+        return None
+    body = json_text.strip()
+    if not body.startswith("{"):
+        return None
+    try:
+        parsed, _end = json.JSONDecoder().raw_decode(body)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(parsed, dict):
+        return None
+    return ToolBlock(mapped, body)
+
+
+def _parse_inline_tool_calls(text: str) -> List[ToolBlock]:
+    """Recover tool calls written as inline backticks or a standalone tool+json line."""
+    if not isinstance(text, str) or not text.strip():
+        return []
+    blocks: List[ToolBlock] = []
+    for pattern in (_INLINE_TOOL_CALL_RE, _STANDALONE_TOOL_LINE_RE):
+        for m in pattern.finditer(text):
+            block = _parse_json_tool_invocation(m.group(1), m.group(2))
+            if block:
+                blocks.append(block)
+        if blocks:
+            break
+    return blocks
+
+
 def _parse_raw_web_json_lookup(text: str) -> Optional[tuple[ToolBlock, tuple[int, int]]]:
     """Recover local text-model web_search calls emitted as prose + bare JSON.
 
@@ -894,8 +943,10 @@ def parse_tool_blocks(text: str, skip_fenced: bool = False) -> List[ToolBlock]:
     """Extract executable tool blocks from LLM response text.
 
     Supports multiple formats:
-    1. ```bash ... ``` fenced code blocks (standard)
-    2. [TOOL_CALL] ... [/TOOL_CALL] blocks (some models)
+    1. ```bash ... ``` fenced code blocks (standard; multiline or single-line JSON)
+    2. Inline backtick tool calls: `manage_calendar {"action": "list_events"}`
+    3. Standalone tool+json lines: manage_calendar {"action": "list_events"}
+    4. [TOOL_CALL] ... [/TOOL_CALL] blocks (some models)
     3. XML-style <tool_call>/<invoke> blocks
     4. <tool_code> blocks (MiniMax-M2.5 style)
     5. StepFun Step-3 native <｜tool▁call▁begin｜> tokens
@@ -946,6 +997,11 @@ def parse_tool_blocks(text: str, skip_fenced: bool = False) -> List[ToolBlock]:
                     blocks.append(block)
                     continue
             blocks.append(ToolBlock(tag, content))
+
+    # Pattern 1b/1c: inline ``manage_calendar {...}`` or a standalone tool+json line.
+    # Not gated by skip_fenced — this markup is never an illustrative example.
+    if not blocks:
+        blocks.extend(_parse_inline_tool_calls(text))
 
     # Pattern 2: [TOOL_CALL] blocks (only if no fenced blocks found)
     # _iter_delimited scans the delimiter-bounded formats forward-only so
@@ -1038,6 +1094,8 @@ def strip_tool_blocks(text: str, skip_fenced: bool = False) -> str:
     # / <tool_call> removers below instead of leaking to the user.
     text = _normalize_dsml(text)
     cleaned = text if skip_fenced else _TOOL_BLOCK_RE.sub('', text)
+    cleaned = _INLINE_TOOL_CALL_RE.sub('', cleaned)
+    cleaned = _STANDALONE_TOOL_LINE_RE.sub('', cleaned)
     # Forward-only removal mirrors parse_tool_blocks: _strip_delimited pairs each
     # opener with a later closer and stops when none is reachable, so untrusted
     # output can't drive the O(n^2) lazy-rescan (ReDoS); see _iter_delimited.
